@@ -8,11 +8,25 @@ use App\Models\Task;
 class TaskController extends Controller
 {
     public function index()
-    {
-        $tasks = Task::all();
+{
+    $tasks = Task::all();
 
-        return view('tasks.index', compact('tasks'));
-    }
+    $totalTasks = Task::count();
+
+    $completedTasks = Task::where('completed', true)->count();
+
+    $pendingTasks = Task::where('completed', false)->count();
+
+    $highPriorityTasks = Task::where('priority', 'High')->count();
+
+    return view('tasks.index', compact(
+        'tasks',
+        'totalTasks',
+        'completedTasks',
+        'pendingTasks',
+        'highPriorityTasks'
+    ));
+}
 
     public function create()
     {
@@ -86,4 +100,25 @@ class TaskController extends Controller
 
         return redirect('/');
     }
+   public function pending()
+{
+    $tasks = Task::where('completed', false)->get();
+
+    return view('tasks.pending',
+        compact('tasks'));
+}
+
+public function completed()
+{
+    $tasks = Task::where('completed', true)->get();
+
+    return view('tasks.completed',
+        compact('tasks'));
+}
+public function highPriority()
+{
+    $tasks = Task::where('priority', 'High')->get();
+
+    return view('tasks.high-priority', compact('tasks'));
+}
 }
