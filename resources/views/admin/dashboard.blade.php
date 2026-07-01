@@ -1,40 +1,23 @@
 @extends('layouts.master')
 
-@section('title', 'Admin Dashboard')
-
 @section('content')
 
 <div class="row">
 
     <div class="col-12">
 
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
 
-            <h4 class="mb-sm-0 font-size-18">
+            <div>
 
-                Admin Dashboard
+                <h4 class="mb-1">
+                    Admin Dashboard
+                </h4>
 
-            </h4>
-
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-
-    <li class="breadcrumb-item">
-        <a href="{{ route('dashboard') }}">
-            Dashboard
-        </a>
-    </li>
-
-    <li class="breadcrumb-item">
-        <a href="{{ route('admin.dashboard') }}">
-            Admin
-        </a>
-    </li>
-
-    
-
-</ol>
-                
+                <p class="text-muted mb-0">
+                    Welcome back,
+                    <strong>{{ Auth::user()->name }}</strong>
+                </p>
 
             </div>
 
@@ -43,9 +26,12 @@
     </div>
 
 </div>
+
+{{-- Statistics --}}
+
 <div class="row">
 
-    <div class="col-md-3">
+    <div class="col-xl-3 col-md-6">
 
         <div class="card mini-stats-wid">
 
@@ -56,20 +42,16 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-
                             Total Users
-
                         </p>
 
-                        <h4>
-
+                        <h3>
                             {{ $totalUsers }}
-
-                        </h4>
+                        </h3>
 
                     </div>
 
-                    <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                    <div class="avatar-sm rounded-circle bg-primary align-self-center">
 
                         <span class="avatar-title rounded-circle bg-primary">
 
@@ -87,7 +69,7 @@
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col-xl-3 col-md-6">
 
         <div class="card mini-stats-wid">
 
@@ -98,24 +80,20 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-
                             Active Users
-
                         </p>
 
-                        <h4>
-
+                        <h3 class="text-success">
                             {{ $activeUsers }}
-
-                        </h4>
+                        </h3>
 
                     </div>
 
-                    <div class="avatar-sm rounded-circle bg-success align-self-center mini-stat-icon">
+                    <div class="avatar-sm rounded-circle bg-success align-self-center">
 
                         <span class="avatar-title rounded-circle bg-success">
 
-                            <i class="bx bx-user-check font-size-24"></i>
+                            <i class="bx bx-check-circle font-size-24"></i>
 
                         </span>
 
@@ -129,7 +107,7 @@
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col-xl-3 col-md-6">
 
         <div class="card mini-stats-wid">
 
@@ -140,20 +118,16 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-
                             Blocked Users
-
                         </p>
 
-                        <h4>
-
+                        <h3 class="text-danger">
                             {{ $blockedUsers }}
-
-                        </h4>
+                        </h3>
 
                     </div>
 
-                    <div class="avatar-sm rounded-circle bg-danger align-self-center mini-stat-icon">
+                    <div class="avatar-sm rounded-circle bg-danger align-self-center">
 
                         <span class="avatar-title rounded-circle bg-danger">
 
@@ -171,7 +145,7 @@
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col-xl-3 col-md-6">
 
         <div class="card mini-stats-wid">
 
@@ -182,20 +156,16 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-
                             Total Tasks
-
                         </p>
 
-                        <h4>
-
+                        <h3>
                             {{ $totalTasks }}
-
-                        </h4>
+                        </h3>
 
                     </div>
 
-                    <div class="avatar-sm rounded-circle bg-info align-self-center mini-stat-icon">
+                    <div class="avatar-sm rounded-circle bg-info align-self-center">
 
                         <span class="avatar-title rounded-circle bg-info">
 
@@ -214,11 +184,14 @@
     </div>
 
 </div>
+
+{{-- Charts --}}
+
 <div class="row">
 
     <div class="col-lg-6">
 
-        <div class="card h-100">
+        <div class="card">
 
             <div class="card-header">
 
@@ -228,9 +201,9 @@
 
             </div>
 
-            <div class="card-body d-flex justify-content-center align-items-center">
+            <div class="card-body">
 
-                <div id="taskStatusChart" style="width:100%;height:320px;"></div>
+                <div id="taskStatusChart" style="height:320px;"></div>
 
             </div>
 
@@ -240,7 +213,7 @@
 
     <div class="col-lg-6">
 
-        <div class="card h-100">
+        <div class="card">
 
             <div class="card-header">
 
@@ -250,29 +223,11 @@
 
             </div>
 
-            <div class="card-body d-flex justify-content-center align-items-center">
+            <div class="card-body">
 
-                <div id="priorityChart" style="width:100%;height:320px;"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-        
-
-    <!-- Priority -->
-    
-
-            <div class="card-header">
-
-                
+                <div id="taskPriorityChart" style="height:320px;"></div>
 
             </div>
-
-           
 
         </div>
 
@@ -287,24 +242,77 @@
 
             <div class="card-header">
 
-                <h4 class="card-title">
-
-                    Quick Actions
-
+                <h4 class="card-title mb-0">
+                    Recent Users
                 </h4>
 
             </div>
 
             <div class="card-body">
 
-                <a href="{{ route('admin.users') }}"
-                   class="btn btn-primary">
+                <div class="table-responsive">
 
-                    <i class="bx bx-group me-1"></i>
+                    <table class="table table-hover align-middle mb-0">
 
-                    Manage Users
+                        <thead>
 
-                </a>
+                            <tr>
+
+                                <th>Name</th>
+
+                                <th>Email</th>
+
+                                <th>Status</th>
+
+                                <th>Joined</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach($recentUsers as $user)
+
+                            <tr>
+
+                                <td>{{ $user->name }}</td>
+
+                                <td>{{ $user->email }}</td>
+
+                                <td>
+
+                                    @if($user->status == 'blocked')
+
+                                        <span class="badge bg-danger">
+                                            Blocked
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge bg-success">
+                                            Active
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                <td>
+
+                                    {{ $user->created_at->format('d M Y') }}
+
+                                </td>
+
+                            </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
@@ -315,141 +323,112 @@
 </div>
 
 @endsection
-@section('scripts')
+
+@push('scripts')
+
+<script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
 
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
 
     // ===========================
-    // TASK STATUS - BAR CHART
+    // TASK STATUS BAR CHART
     // ===========================
 
-    var taskStatusOptions = {
-
-        series: [{
-
-            name: 'Tasks',
-
-            data: [
-                {{ $completedTasks }},
-                {{ $pendingTasks }}
-            ]
-
-        }],
-
-        chart: {
-
-            type: 'bar',
-
-            height: 320,
-
-            toolbar: {
-                show: false
-            }
-
-        },
-
-        plotOptions: {
-
-            bar: {
-
-                horizontal: false,
-
-                columnWidth: '45%',
-
-                borderRadius: 6
-
-            }
-
-        },
-
-        dataLabels: {
-
-            enabled: true
-
-        },
-
-        xaxis: {
-
-            categories: [
-
-                'Completed',
-
-                'Pending'
-
-            ]
-
-        },
-
-        colors: [
-
-            '#34c38f'
-
-        ]
-
-    };
-
-    var taskChart = new ApexCharts(
-
+    var statusChart = new ApexCharts(
         document.querySelector("#taskStatusChart"),
+        {
+            chart: {
+                type: 'bar',
+                height: 320,
+                toolbar: {
+                    show: false
+                }
+            },
 
-        taskStatusOptions
+            colors: ['#556ee6'],
 
+            series: [{
+                name: 'Tasks',
+                data: [
+                    {{ $completedTasks }},
+                    {{ $pendingTasks }}
+                ]
+            }],
+
+            xaxis: {
+                categories: [
+                    'Completed',
+                    'Pending'
+                ]
+            },
+
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    columnWidth: '45%'
+                }
+            },
+
+            dataLabels: {
+                enabled: true
+            },
+
+            grid: {
+                borderColor: '#f1f1f1'
+            }
+        }
     );
 
-    taskChart.render();
-
-
+    statusChart.render();
 
     // ===========================
-    // TASK PRIORITY - PIE CHART
+    // TASK PRIORITY PIE CHART
     // ===========================
-
-    var priorityOptions = {
-
-        series: [
-
-            {{ $highPriority }},
-
-            {{ $mediumPriority }},
-
-            {{ $lowPriority }}
-
-        ],
-
-        chart: {
-
-            type: 'pie',
-
-            height: 350
-
-        },
-
-        labels: [
-
-            'High',
-
-            'Medium',
-
-            'Low'
-
-        ],
-
-        legend: {
-
-            position: 'bottom'
-
-        }
-
-    };
 
     var priorityChart = new ApexCharts(
+        document.querySelector("#taskPriorityChart"),
+        {
+            chart: {
+                type: 'pie',
+                height: 320
+            },
 
-        document.querySelector("#priorityChart"),
+            labels: [
+                'High',
+                'Medium',
+                'Low'
+            ],
 
-        priorityOptions
+            series: [
+                {{ $highPriority }},
+                {{ $mediumPriority }},
+                {{ $lowPriority }}
+            ],
 
+            colors: [
+                '#f46a6a',
+                '#f1b44c',
+                '#34c38f'
+            ],
+
+            legend: {
+                position: 'bottom'
+            },
+
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 300
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        }
     );
 
     priorityChart.render();
@@ -458,4 +437,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 
-@endsection
+@endpush
