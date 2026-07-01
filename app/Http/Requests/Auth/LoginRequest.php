@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-
+use App\Models\User;
 class LoginRequest extends FormRequest
 {
     /**
@@ -39,19 +39,30 @@ class LoginRequest extends FormRequest
      * @throws ValidationException
      */
     public function authenticate(): void
-    {
-        $this->ensureIsNotRateLimited();
+{
+    $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+    if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
+        RateLimiter::hit($this->throttleKey());
 
-        RateLimiter::clear($this->throttleKey());
+        throw ValidationException::withMessages([
+            'email' => __('auth.failed'),
+        ]);
     }
+
+    // Check if the authenticated user is blocked
+    if (Auth::user()->status === 'blocked') {
+
+        Auth::logout();
+
+        throw ValidationException::withMessages([
+            'email' => 'Your account has been blocked by the administrator. Please contact support.',
+        ]);
+    }
+
+    RateLimiter::clear($this->throttleKey());
+}
 
     /**
      * Ensure the login request is not rate limited.

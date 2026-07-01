@@ -1,25 +1,152 @@
-@extends('layouts.dashboard')
+@extends('layouts.master')
 
 @section('content')
 
-<h2>Pending Tasks</h2>
+<div class="row">
 
-<table class="table">
+    <div class="col-12">
 
-@foreach($tasks as $task)
+        <div class="page-title-box d-flex align-items-center justify-content-between">
 
-<tr>
+            <h4 class="mb-0">
 
-    <td>{{ $task->title }}</td>
+                Pending Tasks
 
-    <td>
-        {{ $task->priority }}
-    </td>
+            </h4>
 
-</tr>
+            <a href="{{ route('tasks.index') }}"
+               class="btn btn-primary">
 
-@endforeach
+                <i class="bx bx-list-ul"></i>
 
-</table>
+                All Tasks
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover">
+
+                <thead class="table-light">
+
+                <tr>
+
+                    <th>SI No.</th>
+
+                    <th>Task</th>
+
+                    <th>Priority</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                @forelse($tasks as $task)
+
+                    <tr>
+
+                        <td>{{ $loop->iteration }}</td>
+
+                        <td>{{ $task->title }}</td>
+
+                        <td>
+
+                            @if($task->priority=='High')
+
+                                <span class="badge bg-danger">
+
+                                    High
+
+                                </span>
+
+                            @elseif($task->priority=='Medium')
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Medium
+
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-success">
+
+                                    Low
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            <form
+                                action="{{ route('tasks.complete',$task->id) }}"
+                                method="POST"
+                                class="d-inline">
+
+                                @csrf
+
+                                @method('PATCH')
+
+                                <button
+                                    class="btn btn-success btn-sm">
+
+                                    Complete
+
+                                </button>
+
+                            </form>
+
+                            <a href="{{ route('tasks.edit',$task->id) }}"
+                               class="btn btn-primary btn-sm">
+
+                                Edit
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="text-center">
+
+                            No Pending Tasks
+
+                        </td>
+
+                    </tr>
+
+                @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
 @endsection

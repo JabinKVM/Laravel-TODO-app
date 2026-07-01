@@ -1,3 +1,10 @@
+<form method="POST"
+      action="{{ route('profile.update') }}"
+      enctype="multipart/form-data">
+
+
+@csrf
+@method('patch')
 <div style="
     display:flex;
     justify-content:space-between;
@@ -7,8 +14,8 @@
 
     <!-- LEFT SIDE -->
     <div style="
-        width:65%;
-    ">
+    width:65%;
+">
 
         <h3 style="
             margin-bottom:25px;
@@ -109,63 +116,44 @@
 
     <!-- RIGHT SIDE -->
     <div style="
-        width:280px;
-        margin-left:40px;
-        text-align:center;
-        background:#ffffff;
-        padding:25px;
-        border-radius:20px;
-        border:1px solid #e5e7eb;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    ">
+    width:220px;
+    margin-left:auto;
+    margin-top:89px;
+    text-align:center;
+">
 
-        @if(Auth::user()->profile_photo)
+    @if(Auth::user()->profile_photo)
 
-            <img
-                src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                alt="Profile"
-                style="
-                    width:140px;
-                    height:140px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    border:4px solid #d1d5db;
-                    display:block;
-                    margin:auto;
-                ">
+        <img
+            src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+            alt="Profile"
+            style="
+                width:180px;
+                height:180px;
+                border-radius:50%;
+                object-fit:cover;
+                border:4px solid #d1d5db;
+            ">
 
-        @else
+    @else
 
-            <img
-                src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&size=300"
-                alt="Profile"
-                style="
-                    width:140px;
-                    height:140px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    border:4px solid #d1d5db;
-                    display:block;
-                    margin:auto;
-                ">
+        <img
+            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&size=300"
+            alt="Profile"
+            style="
+                width:180px;
+                height:180px;
+                border-radius:50%;
+                object-fit:cover;
+                border:4px solid #d1d5db;
+            ">
 
-        @endif
+    @endif
 
-        <h3 style="
-            margin-top:15px;
-            font-size:22px;
-            font-weight:bold;
-        ">
-            {{ Auth::user()->name }}
-        </h3>
-
-        <p style="
-            color:#6b7280;
-            margin-top:5px;
-        ">
-            Profile Photo
-        </p>
-
-    </div>
+    <h4 style="margin-top:15px;">
+        {{ Auth::user()->name }}
+    </h4>
 
 </div>
+</div>
+</form>

@@ -7,118 +7,172 @@ use App\Models\Task;
 
 class TaskController extends Controller
 {
+    /**
+     * Dashboard
+     */
+    public function dashboard()
+    {
+        $totalTasks = Task::where('user_id', auth()->id())->count();
+
+        $completedTasks = Task::where('user_id', auth()->id())
+            ->where('completed', true)
+            ->count();
+
+        $pendingTasks = Task::where('user_id', auth()->id())
+            ->where('completed', false)
+            ->count();
+
+        $highPriorityTasks = Task::where('user_id', auth()->id())
+            ->where('priority', 'High')
+            ->count();
+
+        return view('dashboard', compact(
+            'totalTasks',
+            'completedTasks',
+            'pendingTasks',
+            'highPriorityTasks'
+        ));
+    }
+
+    /**
+     * All Tasks
+     */
     public function index()
-{
-    $tasks = Task::all();
+    {
+        $tasks = Task::where('user_id', auth()->id())
+        ->orderBy('created_at', 'asc')   // oldest task first
+        ->get();
 
-    $totalTasks = Task::count();
+        return view('tasks.index', compact('tasks'));
+    }
 
-    $completedTasks = Task::where('completed', true)->count();
-
-    $pendingTasks = Task::where('completed', false)->count();
-
-    $highPriorityTasks = Task::where('priority', 'High')->count();
-
-    return view('tasks.index', compact(
-        'tasks',
-        'totalTasks',
-        'completedTasks',
-        'pendingTasks',
-        'highPriorityTasks'
-    ));
-}
-
+    /**
+     * Create Task Page
+     */
     public function create()
     {
         return view('tasks.create');
     }
 
+    /**
+     * Store Task
+     */
     public function store(Request $request)
     {
-        $request->validate(
-            [
-                'title' => 'required|max:255'
-            ],
-            [
-                'title.required' => 'Task field cannot be empty.',
-                'title.max' => 'Task must not exceed 255 characters.'
-            ]
-        );
+        $request->validate([
+            'title' => 'required|max:255',
+            'priority' => 'required'
+        ]);
 
         Task::create([
+            'user_id' => auth()->id(),
             'title' => $request->title,
             'priority' => $request->priority,
             'completed' => false
         ]);
 
-        return redirect('/');
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task created successfully.');
     }
 
+    /**
+     * Edit Task
+     */
     public function edit($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::where('user_id', auth()->id())
+            ->findOrFail($id);
 
         return view('tasks.edit', compact('task'));
     }
 
+    /**
+     * Update Task
+     */
     public function update(Request $request, $id)
     {
-        $request->validate(
-            [
-                'title' => 'required|max:255'
-            ],
-            [
-                'title.required' => 'Task field cannot be empty.',
-                'title.max' => 'Task must not exceed 255 characters.'
-            ]
-        );
+        $request->validate([
+            'title' => 'required|max:255',
+            'priority' => 'required'
+        ]);
 
-        $task = Task::findOrFail($id);
+        $task = Task::where('user_id', auth()->id())
+            ->findOrFail($id);
 
         $task->update([
             'title' => $request->title,
-            'priority' => $request->priority
+            'priority' => $request->priority,
         ]);
 
-        return redirect('/');
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task updated successfully.');
     }
 
+    /**
+     * Complete Task
+     */
     public function complete($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::where('user_id', auth()->id())
+            ->findOrFail($id);
 
         $task->completed = true;
-
         $task->save();
 
-        return redirect('/');
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task completed.');
     }
 
+    /**
+     * Delete Task
+     */
     public function destroy($id)
     {
-        Task::destroy($id);
+        $task = Task::where('user_id', auth()->id())
+            ->findOrFail($id);
 
-        return redirect('/');
+        $task->delete();
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task deleted.');
     }
-   public function pending()
-{
-    $tasks = Task::where('completed', false)->get();
 
-    return view('tasks.pending',
-        compact('tasks'));
-}
+    /**
+     * Pending Tasks
+     */
+    public function pending()
+    {
+        $tasks = Task::where('user_id', auth()->id())
+            ->where('completed', false)
+            ->latest()
+            ->get();
 
-public function completed()
-{
-    $tasks = Task::where('completed', true)->get();
+        return view('tasks.pending', compact('tasks'));
+    }
 
-    return view('tasks.completed',
-        compact('tasks'));
-}
-public function highPriority()
-{
-    $tasks = Task::where('priority', 'High')->get();
+    /**
+     * Completed Tasks
+     */
+    public function completed()
+    {
+        $tasks = Task::where('user_id', auth()->id())
+            ->where('completed', true)
+            ->latest()
+            ->get();
 
-    return view('tasks.high-priority', compact('tasks'));
-}
+        return view('tasks.completed', compact('tasks'));
+    }
+
+    /**
+     * High Priority Tasks
+     */
+    public function highPriority()
+    {
+        $tasks = Task::where('user_id', auth()->id())
+            ->where('priority', 'High')
+            ->latest()
+            ->get();
+
+        return view('tasks.high_priority', compact('tasks'));
+    }
 }

@@ -1,85 +1,186 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Task</title>
+@extends('layouts.master')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-</head>
-<body>
+@section('content')
 
-<div class="container mt-5">
+<div class="row">
 
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Add New Task</h3>
-        </div>
+    <div class="col-12">
 
-        <div class="card-body">
+        <div class="page-title-box d-flex justify-content-between align-items-center">
 
-            <form action="/store" method="POST">
+            <h4 class="mb-0">
+                Create Task
+            </h4>
 
-                @csrf
+            <a href="{{ route('tasks.index') }}" class="btn btn-secondary">
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        Task Name
-                    </label>
+                <i class="bx bx-arrow-back"></i>
 
-                    <input type="text"
-                           name="title"
-                           class="form-control"
-                           placeholder="Enter Task"
-                           value="{{ old('title') }}">
+                Back
 
-                    @error('title')
-                        <div class="text-danger mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">
-                        Priority
-                    </label>
-
-                    <select name="priority" class="form-select">
-
-                        <option value="High"
-                            {{ old('priority') == 'High' ? 'selected' : '' }}>
-                            High
-                        </option>
-
-                        <option value="Medium"
-                            {{ old('priority', 'Medium') == 'Medium' ? 'selected' : '' }}>
-                            Medium
-                        </option>
-
-                        <option value="Low"
-                            {{ old('priority') == 'Low' ? 'selected' : '' }}>
-                            Low
-                        </option>
-
-                    </select>
-                </div>
-
-                <button type="submit"
-                        class="btn btn-success">
-                    Add Task
-                </button>
-
-                <a href="/"
-                   class="btn btn-secondary">
-                    Back
-                </a>
-
-            </form>
+            </a>
 
         </div>
+
     </div>
 
 </div>
 
-</body>
-</html>
+<div class="row">
+
+    <div class="col-lg-8">
+
+        <div class="card">
+
+            <div class="card-header bg-primary text-white">
+
+                <h5 class="mb-0">
+                    Add New Task
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <form action="{{ route('tasks.store') }}" method="POST">
+
+                    @csrf
+
+                    <!-- Task Title -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Task Title
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="title"
+                            class="form-control @error('title') is-invalid @enderror"
+                            placeholder="Enter task title"
+                            value="{{ old('title') }}">
+
+                        @error('title')
+
+                            <div class="invalid-feedback">
+
+                                {{ $message }}
+
+                            </div>
+
+                        @enderror
+
+                    </div>
+
+                    <!-- Priority -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Priority
+
+                        </label>
+
+                        <select
+                            name="priority"
+                            class="form-select">
+
+                            <option value="Low">
+
+                                Low
+
+                            </option>
+
+                            <option value="Medium">
+
+                                Medium
+
+                            </option>
+
+                            <option value="High">
+
+                                High
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Buttons -->
+
+                    <div class="mt-4">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary">
+
+                            <i class="bx bx-save"></i>
+
+                            Save Task
+
+                        </button>
+
+                        <a
+                            href="{{ route('tasks.index') }}"
+                            class="btn btn-light">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Right Card -->
+
+    <div class="col-lg-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                Task Information
+
+            </div>
+
+            <div class="card-body">
+
+                <p>
+
+                    Use this page to create a new task.
+
+                </p>
+
+                <ul>
+
+                    <li>Select the appropriate priority.</li>
+
+                    <li>High priority tasks appear separately.</li>
+
+                    <li>Tasks are initially marked as Pending.</li>
+
+                    <li>You can edit or complete tasks later.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endsection

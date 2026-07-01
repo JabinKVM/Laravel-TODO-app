@@ -1,34 +1,91 @@
-<x-guest-layout>
+<!doctype html>
+<html lang="en">
 
-<div class="min-h-screen flex">
+<head>
 
-    <!-- Left Side -->
-    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 items-center justify-center">
+    <meta charset="utf-8" />
 
-        <div class="text-center text-white px-10">
+    <title>Login | TodoPro</title>
 
-            <h1 class="text-6xl font-bold mb-6">
-                TodoPro
-            </h1>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-            <p class="text-xl opacity-90">
-                Organize your work, boost productivity,
-                and accomplish your goals.
-            </p>
+    <meta name="description"
+          content="TodoPro Login">
 
-            <div class="mt-10 space-y-4 text-left max-w-md mx-auto">
+    <meta name="author"
+          content="Jabin KVM">
 
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl">
-                    ✓ Manage Tasks Efficiently
+    <meta name="csrf-token"
+          content="{{ csrf_token() }}">
+
+    <!-- Favicon -->
+
+    <link rel="shortcut icon"
+          href="{{ asset('assets/images/favicon.ico') }}">
+
+    <!-- Bootstrap -->
+
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}"
+          rel="stylesheet">
+
+    <!-- Icons -->
+
+    <link href="{{ asset('assets/css/icons.min.css') }}"
+          rel="stylesheet">
+
+    <!-- App -->
+
+    <link href="{{ asset('assets/css/app.min.css') }}"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="account-pages my-5 pt-sm-5">
+
+<div class="container">
+
+<div class="row justify-content-center">
+
+<div class="col-md-8 col-lg-6 col-xl-5">
+
+<div class="card overflow-hidden shadow-lg">
+
+    <!-- Top Banner -->
+
+    <div class="bg-primary bg-soft">
+
+        <div class="row">
+
+            <div class="col-7">
+
+                <div class="text-primary p-4">
+
+                    <h5 class="text-primary">
+
+                        Welcome Back 👋
+
+                    </h5>
+
+                    <p class="mb-0">
+
+                        Sign in to continue to
+
+                        <strong>TodoPro</strong>
+
+                    </p>
+
                 </div>
 
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl">
-                    ✓ Track Priorities
-                </div>
+            </div>
 
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl">
-                    ✓ Monitor Progress
-                </div>
+            <div class="col-5 align-self-end">
+
+                <img
+                    src="{{ asset('assets/images/profile-img.png') }}"
+                    class="img-fluid">
 
             </div>
 
@@ -36,111 +93,285 @@
 
     </div>
 
-    <!-- Right Side -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center bg-gray-100">
+    <!-- Logo -->
 
-        <div class="w-full max-w-md">
+    <div class="card-body pt-0">
 
-            <div class="bg-white shadow-2xl rounded-3xl p-10">
+        <div class="auth-logo">
 
-                <div class="text-center mb-8">
+            <a href="{{ url('/') }}"
+               class="auth-logo-dark">
 
-                    <h2 class="text-4xl font-bold text-gray-800">
-                        Welcome Back
-                    </h2>
+                <div class="avatar-md profile-user-wid mb-4">
 
-                    <p class="text-gray-500 mt-2">
-                        Sign in to continue
-                    </p>
+                    <span class="avatar-title rounded-circle bg-light">
+
+                        <i class="bx bx-task text-primary"
+                           style="font-size:35px;"></i>
+
+                    </span>
 
                 </div>
 
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
+            </a>
 
-                    <div class="mb-5">
+        </div>
 
-                        <label class="block text-gray-700 mb-2">
-                            Email Address
-                        </label>
+        <div class="text-center mb-4">
 
-                        <input type="email"
-                               name="email"
-                               value="{{ old('email') }}"
-                               class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                               required autofocus>
+            <h4>
 
-                        @error('email')
-                            <div class="text-red-500 text-sm mt-1">
-                                {{ $message }}
-                            </div>
-                        @enderror
+                TodoPro
 
-                    </div>
+            </h4>
 
-                    <div class="mb-5">
+            <p class="text-muted">
 
-                        <label class="block text-gray-700 mb-2">
-                            Password
-                        </label>
+                Smart Task Management System
 
-                        <input type="password"
-                               name="password"
-                               class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                               required>
+            </p>
 
-                        @error('password')
-                            <div class="text-red-500 text-sm mt-1">
-                                {{ $message }}
-                            </div>
-                        @enderror
+        </div>
+            {{-- Success Message --}}
+@if(session('success'))
 
-                    </div>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
 
-                    <div class="flex justify-between items-center mb-6">
+    {{ session('success') }}
 
-                        <label class="flex items-center">
-                            <input type="checkbox"
-                                   name="remember"
-                                   class="mr-2">
-                            Remember Me
-                        </label>
+    <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close">
+    </button>
 
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}"
-                               class="text-indigo-600 hover:underline">
-                                Forgot Password?
-                            </a>
-                        @endif
+</div>
 
-                    </div>
+@endif
 
-                    <button type="submit"
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition">
-                        Sign In
-                    </button>
+{{-- Error Messages --}}
+@if ($errors->any())
 
-                    <div class="text-center mt-6">
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
 
-                        <span class="text-gray-500">
-                            Don't have an account?
+    <ul class="mb-0">
+
+        @foreach ($errors->all() as $error)
+
+            <li>{{ $error }}</li>
+
+        @endforeach
+
+    </ul>
+
+    <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close">
+    </button>
+
+</div>
+
+@endif
+                       <!-- Login Form -->
+
+        <div class="p-2">
+
+            <form method="POST"
+                  action="{{ route('login') }}">
+
+                @csrf
+
+                <!-- Email -->
+
+                <div class="mb-3">
+
+                    <label for="email"
+                           class="form-label">
+
+                        Email Address
+
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        class="form-control @error('email') is-invalid @enderror"
+                        placeholder="Enter your email"
+                        required
+                        autofocus>
+
+                    @error('email')
+
+                        <span class="invalid-feedback">
+
+                            <strong>{{ $message }}</strong>
+
                         </span>
 
-                        <a href="{{ route('register') }}"
-                           class="text-indigo-600 font-semibold hover:underline">
-                            Register
-                        </a>
+                    @enderror
+
+                </div>
+
+                <!-- Password -->
+
+                <div class="mb-3">
+
+                    <label for="password"
+                           class="form-label">
+
+                        Password
+
+                    </label>
+
+                    <div class="input-group auth-pass-inputgroup">
+
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            class="form-control @error('password') is-invalid @enderror"
+                            placeholder="Enter your password"
+                            required>
+
+                        <button
+                            class="btn btn-light"
+                            type="button"
+                            id="togglePassword">
+
+                            <i class="mdi mdi-eye-outline"></i>
+
+                        </button>
+
+                        @error('password')
+
+                            <span class="invalid-feedback d-block">
+
+                                <strong>{{ $message }}</strong>
+
+                            </span>
+
+                        @enderror
 
                     </div>
 
-                </form>
+                </div>
 
-            </div>
+                <!-- Remember Me -->
+
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="remember_me"
+                        name="remember">
+
+                    <label
+                        class="form-check-label"
+                        for="remember_me">
+
+                        Remember Me
+
+                    </label>
+
+                </div>
+
+                <!-- Login Button -->
+
+                <div class="mt-4 d-grid">
+
+                    <button
+                        class="btn btn-primary waves-effect waves-light"
+                        type="submit">
+
+                        <i class="bx bx-log-in-circle me-2"></i>
+
+                        Sign In
+
+                    </button>
+
+                </div>
+
+                <!-- Forgot Password -->
+
+                @if (Route::has('password.request'))
+
+                <div class="mt-4 text-center">
+
+                    <a href="{{ route('password.request') }}"
+                       class="text-muted">
+
+                        <i class="mdi mdi-lock me-1"></i>
+
+                        Forgot your password?
+
+                    </a>
+
+                </div>
+
+                @endif
+
+            </form>
 
         </div>
 
     </div>
 
 </div>
+<!-- Register -->
 
-</x-guest-layout>
+<div class="mt-5 text-center">
+
+    <p>
+
+        Don't have an account?
+
+        <a href="{{ route('register') }}"
+           class="fw-medium text-primary">
+
+            Create Account
+
+        </a>
+
+    </p>
+
+    <p class="text-muted">
+
+        © {{ date('Y') }}
+
+        TodoPro
+
+        <br>
+
+        <small>
+
+            Built with Laravel 12 
+
+        </small>
+
+    </p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- JAVASCRIPT -->
+
+
+
+</body>
+
+</html>
