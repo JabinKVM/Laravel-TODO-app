@@ -78,7 +78,8 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-editable table-nowrap align-middle table-edits">
+                    <table id="highPriorityTable"
+                        class="table table-editable table-nowrap align-middle table-edits datatable">
 
                         <thead>
 
