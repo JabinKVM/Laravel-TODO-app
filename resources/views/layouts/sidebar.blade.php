@@ -1,48 +1,37 @@
+<!-- ========== Left Sidebar Start ========== -->
+
 <div class="vertical-menu">
 
-    <!-- Logo -->
-    <div class="navbar-brand-box">
-
-        <a href="{{ route('dashboard') }}" class="text-decoration-none text-center">
-
-            <h2 class="text-white fw-bold mb-0">
-                TodoPro
-            </h2>
-
-            <small class="text-light">
-                Task Manager
-            </small>
-
-        </a>
-
-    </div>
-
     <div data-simplebar class="h-100">
+
+        <!-- Sidebar Menu -->
 
         <div id="sidebar-menu">
 
             <ul class="metismenu list-unstyled" id="side-menu">
 
-                <!-- MENU -->
-                <li class="menu-title">
+                <!-- ================= MENU ================= -->
+
+                <li class="menu-title" key="t-menu">
                     Menu
                 </li>
 
                 <li>
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('dashboard') }}" class="waves-effect">
                         <i class="bx bx-home-circle"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                <!-- TASKS -->
-                <li class="menu-title">
+                <!-- ================= TASKS ================= -->
+
+                <li class="menu-title" key="t-tasks">
                     Tasks
                 </li>
 
                 <li>
 
-                    <a href="javascript:void(0);" class="has-arrow">
+                    <a href="javascript:void(0);" class="has-arrow waves-effect">
 
                         <i class="bx bx-task"></i>
 
@@ -50,7 +39,7 @@
 
                     </a>
 
-                    <ul class="sub-menu">
+                    <ul class="sub-menu" aria-expanded="false">
 
                         <li>
                             <a href="{{ route('tasks.index') }}">
@@ -85,53 +74,53 @@
                     </ul>
 
                 </li>
-                <!-- =========================
-        SETTINGS
-========================== -->
 
-<li class="menu-title">
-    Settings
-</li>
+                <!-- ================= SETTINGS ================= -->
 
-<li>
-    <a href="{{ route('profile.edit') }}">
-        <i class="bx bx-user-circle"></i>
-        <span>View Profile</span>
-    </a>
-</li>
+                <li class="menu-title" key="t-settings">
+                    Settings
+                </li>
 
-<li>
-    <a href="{{ route('logout') }}"
-       onclick="event.preventDefault();
-       document.getElementById('logout-form').submit();">
+                <li>
 
-        <i class="bx bx-log-out"></i>
-        <span>Logout</span>
+                    <a href="{{ route('profile.edit') }}" class="waves-effect">
 
-    </a>
+                        <i class="bx bx-user-circle"></i>
 
-    <form id="logout-form"
-          action="{{ route('logout') }}"
-          method="POST"
-          class="d-none">
-        @csrf
-    </form>
-</li>
-                
+                        <span>Profile</span>
 
-                @if(auth()->user()->role == 'admin')
+                    </a>
 
-                <!-- ADMIN -->
+                </li>
 
-                <li class="menu-title">
+                <li>
+
+                    <a href="#"
+                       class="waves-effect"
+                       onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
+
+                        <i class="bx bx-log-out-circle"></i>
+
+                        <span>Logout</span>
+
+                    </a>
+
+                </li>
+
+                @if(Auth::user()->role == 'admin')
+
+                <!-- ================= ADMIN ================= -->
+
+                <li class="menu-title" key="t-admin">
                     Admin
                 </li>
 
                 <li>
 
-                    <a href="{{ route('admin.dashboard') }}">
+                    <a href="{{ route('admin.dashboard') }}" class="waves-effect">
 
-                        <i class="bx bx-shield"></i>
+                        <i class="bx bx-shield-quarter"></i>
 
                         <span>Admin Dashboard</span>
 
@@ -141,7 +130,7 @@
 
                 <li>
 
-                    <a href="{{ route('admin.users') }}">
+                    <a href="{{ route('admin.users') }}" class="waves-effect">
 
                         <i class="bx bx-group"></i>
 
@@ -160,3 +149,14 @@
     </div>
 
 </div>
+
+<form id="logout-form"
+      action="{{ route('logout') }}"
+      method="POST"
+      class="d-none">
+
+    @csrf
+
+</form>
+
+<!-- Left Sidebar End -->

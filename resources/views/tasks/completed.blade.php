@@ -1,27 +1,56 @@
 @extends('layouts.master')
 
+@section('title','Completed Tasks')
+
 @section('content')
+
+<!-- start page title -->
 
 <div class="row">
 
     <div class="col-12">
 
-        <div class="page-title-box d-flex align-items-center justify-content-between">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
-            <h4 class="mb-0">
+            <h4 class="mb-sm-0 font-size-18">
+
                 Completed Tasks
+
             </h4>
 
-            <a href="{{ route('tasks.index') }}" class="btn btn-primary">
-                <i class="bx bx-arrow-back"></i>
-                Back to All Tasks
-            </a>
+            <div class="page-title-right">
+
+                <ol class="breadcrumb m-0">
+
+                    <li class="breadcrumb-item">
+
+                        <a href="{{ route('dashboard') }}">
+
+                            Dashboard
+
+                        </a>
+
+                    </li>
+
+                    <li class="breadcrumb-item">
+
+                        Tasks
+
+                    </li>
+
+                    
+
+                </ol>
+
+            </div>
 
         </div>
 
     </div>
 
 </div>
+
+<!-- end page title -->
 
 @if(session('success'))
 
@@ -29,155 +58,114 @@
 
     {{ session('success') }}
 
-    <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
-    </button>
+    <button class="btn-close" data-bs-dismiss="alert"></button>
 
 </div>
 
 @endif
 
-<div class="card">
+<div class="row">
 
-    <div class="card-header">
+    <div class="col-12">
 
-        <h4 class="card-title mb-0">
-            Completed Task List
-        </h4>
+        <div class="card">
 
-    </div>
+            <div class="card-body">
 
-    <div class="card-body">
+                
 
-        <div class="table-responsive">
+                <div class="table-responsive">
 
-            <table class="table table-hover align-middle">
+                    <table class="table table-editable table-nowrap align-middle table-edits">
 
-                <thead class="table-light">
+                        <thead>
 
-                    <tr>
+                            <tr>
 
-                        <th>SI NO.</th>
+                                <th>ID</th>
 
-                        <th>Task</th>
+                                <th>Task</th>
 
-                        <th>Priority</th>
+                                <th>Priority</th>
 
-                        <th>Status</th>
+                                <th>Status</th>
 
-                        <th width="180">
-                            Actions
-                        </th>
+                                <th>Edit</th>
 
-                    </tr>
+                            </tr>
 
-                </thead>
+                        </thead>
 
-                <tbody>
+                        <tbody>
 
-                @forelse($tasks as $task)
+@forelse($tasks as $task)
 
-                    <tr>
+<tr data-id="{{ $task->id }}">
 
-                        <td>{{ $loop->iteration }}</td>
+    <td data-field="id" style="width:80px">
 
-                        <td>{{ $task->title }}</td>
+        {{ $loop->iteration }}
 
-                        <td>
+    </td>
 
-                            @if($task->priority == 'High')
+    <td data-field="name">
 
-                                <span class="badge bg-danger">
+        {{ $task->title }}
 
-                                    High
+    </td>
 
-                                </span>
+    <td data-field="age">
 
-                            @elseif($task->priority == 'Medium')
+        {{ $task->priority }}
 
-                                <span class="badge bg-warning text-dark">
+    </td>
 
-                                    Medium
+    <td data-field="gender">
 
-                                </span>
+        Completed
 
-                            @else
+    </td>
 
-                                <span class="badge bg-success">
+    <td style="width:100px">
 
-                                    Low
+        <a href="{{ route('tasks.edit',$task->id) }}"
+           class="btn btn-outline-secondary btn-sm edit"
+           title="Edit">
 
-                                </span>
+            <i class="fas fa-pencil-alt"></i>
 
-                            @endif
+        </a>
 
-                        </td>
+    </td>
 
-                        <td>
+</tr>
+@empty
 
-                            <span class="badge bg-success">
+<tr>
 
-                                Completed
+    <td colspan="5" class="text-center py-5">
 
-                            </span>
+        No Completed Tasks Found
 
-                        </td>
+    </td>
 
-                        <td>
+</tr>
 
-                            <a href="{{ route('tasks.edit',$task->id) }}"
-                               class="btn btn-primary btn-sm">
+@endforelse
 
-                                Edit
+                        </tbody>
 
-                            </a>
+                    </table>
 
-                            <form
-                                action="{{ route('tasks.destroy',$task->id) }}"
-                                method="POST"
-                                class="d-inline">
+                </div>
 
-                                @csrf
-                                @method('DELETE')
-
-                                <button
-                                    onclick="return confirm('Delete this task?')"
-                                    class="btn btn-danger btn-sm">
-
-                                    Delete
-
-                                </button>
-
-                            </form>
-
-                        </td>
-
-                    </tr>
-
-                @empty
-
-                    <tr>
-
-                        <td colspan="5"
-                            class="text-center text-muted">
-
-                            No Completed Tasks Found.
-
-                        </td>
-
-                    </tr>
-
-                @endforelse
-
-                </tbody>
-
-            </table>
+            </div>
 
         </div>
 
     </div>
 
 </div>
+
 
 @endsection

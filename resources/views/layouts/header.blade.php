@@ -2,104 +2,159 @@
 
     <div class="navbar-header">
 
-        <!-- LEFT SIDE -->
-        <div class="d-flex align-items-center">
+        <div class="d-flex">
 
-            <!-- Sidebar Toggle -->
-            <button
-                type="button"
-                class="btn btn-sm px-3 header-item"
-                id="vertical-menu-btn">
+            <!-- LOGO -->
 
-                <i class="fa fa-bars font-size-22"></i>
+            <div class="navbar-brand-box">
+
+                <a href="{{ route('dashboard') }}"
+                   class="logo logo-dark">
+
+                    <span class="logo-sm">
+
+                        <span class="logo-txt fw-bold fs-3">
+
+                            T
+
+                        </span>
+
+                    </span>
+
+                    <span class="logo-lg">
+
+                        <span class="logo-txt fw-bold fs-4">
+
+                            TodoPro
+                           
+
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a href="{{ route('dashboard') }}"
+                   class="logo logo-light">
+
+                    <span class="logo-sm">
+
+                        <span class="logo-txt text-white fw-bold fs-3">
+
+                            T
+
+                        </span>
+
+                    </span>
+
+                    <span class="logo-lg">
+
+                        <span class="logo-txt text-white fw-bold fs-4">
+
+                            TodoPro
+
+                        </span>
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- MENU BUTTON -->
+
+            <button type="button"
+                    class="btn btn-sm px-3 font-size-16 header-item waves-effect"
+                    id="vertical-menu-btn">
+
+                <i class="fa fa-fw fa-bars"></i>
 
             </button>
 
-            <!-- Project Name -->
-            
+            <!-- SEARCH -->
 
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="d-flex align-items-center">
-
-            <!-- Search -->
-            <form action="{{ route('tasks.index') }}" method="GET" class="d-none d-lg-block me-4">
+            <form class="app-search d-none d-lg-block">
 
                 <div class="position-relative">
 
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control rounded-pill ps-5"
-                        placeholder="Search Tasks..."
-                        value="{{ request('search') }}">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search...">
 
-                    <i class="bx bx-search position-absolute"
-                       style="left:18px;top:12px;color:#74788d;"></i>
+                    <span class="bx bx-search-alt"></span>
 
                 </div>
 
             </form>
 
-            <!-- User -->
-            <div class="dropdown">
+        </div>
 
-                <button
-                    class="btn header-item d-flex align-items-center"
-                    data-bs-toggle="dropdown">
+        <div class="d-flex">
 
-                    @if(Auth::user()->profile_photo)
+            <!-- FULLSCREEN -->
 
-                        <img
-                            src="{{ asset('storage/'.Auth::user()->profile_photo) }}"
-                            class="rounded-circle"
-                            width="36"
-                            height="36">
+            <div class="dropdown d-none d-lg-inline-block ms-1">
 
-                    @else
+                <button type="button"
+                        class="btn header-item noti-icon waves-effect"
+                        data-bs-toggle="fullscreen">
 
-                        <img
-                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}"
-                            class="rounded-circle"
-                            width="36">
+                    <i class="bx bx-fullscreen"></i>
 
-                    @endif
+                </button>
 
-                    <span class="ms-2 d-none d-xl-inline-block">
+            </div>
+
+            <!-- USER -->
+
+            <div class="dropdown d-inline-block">
+
+                <button type="button"
+                        class="btn header-item waves-effect"
+                        id="page-header-user-dropdown"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+
+                   <img
+    class="rounded-circle header-profile-user"
+    src="{{ Auth::user()->profile_photo
+            ? asset('storage/' . Auth::user()->profile_photo)
+            : asset('assets/images/users/avatar-1.jpg') }}"
+    alt="{{ Auth::user()->name }}">
+
+                    <span class="d-none d-xl-inline-block ms-2">
 
                         {{ Auth::user()->name }}
 
                     </span>
 
-                    <i class="mdi mdi-chevron-down ms-1"></i>
+                    <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
 
                 </button>
 
                 <div class="dropdown-menu dropdown-menu-end">
 
-                    <a
-                        class="dropdown-item"
-                        href="{{ route('profile.edit') }}">
+                    <a class="dropdown-item"
+                       href="{{ route('profile.edit') }}">
 
                         <i class="bx bx-user me-2"></i>
 
-                        My Profile
+                        View Profile
 
                     </a>
 
                     <div class="dropdown-divider"></div>
 
-                    <form
-                        action="{{ route('logout') }}"
-                        method="POST">
+                    <form action="{{ route('logout') }}"
+                          method="POST">
 
                         @csrf
 
-                        <button
-                            class="dropdown-item">
+                        <button class="dropdown-item text-danger"
+                                type="submit">
 
-                            <i class="bx bx-log-out me-2"></i>
+                            <i class="bx bx-power-off me-2"></i>
 
                             Logout
 

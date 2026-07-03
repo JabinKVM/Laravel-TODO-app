@@ -1,31 +1,68 @@
-<meta charset="utf-8" />
+<head>
 
-<title>TodoPro | Task Management System</title>
+    <meta charset="utf-8" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title','TodoPro | Task Management System')</title>
 
-<meta content="TodoPro Laravel Application" name="description" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<meta content="Jabin KVM" name="author" />
+    <meta name="description"
+          content="TodoPro - Task Management System">
 
-<meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="author"
+          content="Jabin KVM">
 
-<link rel="shortcut icon"
-      href="{{ asset('assets/images/favicon.ico') }}">
+    <meta name="csrf-token"
+          content="{{ csrf_token() }}">
 
-<!-- Bootstrap Css -->
+    <!-- App favicon -->
 
-<link href="{{ asset('assets/css/bootstrap.min.css') }}"
-      rel="stylesheet">
+    <link rel="shortcut icon"
+          href="{{ asset('assets/images/favicon.ico') }}">
 
-<!-- Icons Css -->
+    <!-- Bootstrap Css -->
 
-<link href="{{ asset('assets/css/icons.min.css') }}"
-      rel="stylesheet">
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}"
+          id="bootstrap-style"
+          rel="stylesheet"
+          type="text/css" />
 
-<!-- App Css -->
+    <!-- Icons Css -->
 
-<link href="{{ asset('assets/css/app.min.css') }}"
-      rel="stylesheet">
-<link href="{{ asset('assets/css/todopro.css') }}"
-      rel="stylesheet">
+    <link href="{{ asset('assets/css/icons.min.css') }}"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- App Css -->
+
+    <link href="{{ asset('assets/css/app.min.css') }}"
+          id="app-style"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- Select2 -->
+
+    <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- Bootstrap Datepicker -->
+
+    <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- Editable Table -->
+
+    <link href="{{ asset('assets/libs/table-edits/build/table-edits.css') }}"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- TodoPro CSS -->
+
+    <link href="{{ asset('assets/css/todopro.css') }}"
+          rel="stylesheet"
+          type="text/css" />
+
+</head>

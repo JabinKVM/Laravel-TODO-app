@@ -47,7 +47,8 @@ Route::middleware('auth')->group(function () {
     // High Priority Tasks
     Route::get('/tasks/high-priority', [TaskController::class, 'highPriority'])
         ->name('tasks.high-priority');
-
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])
+    ->name('tasks.destroy');
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');

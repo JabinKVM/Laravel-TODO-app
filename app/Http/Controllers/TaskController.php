@@ -37,14 +37,25 @@ class TaskController extends Controller
     /**
      * All Tasks
      */
-    public function index()
-    {
-        $tasks = Task::where('user_id', auth()->id())
-        ->orderBy('created_at', 'asc')   // oldest task first
+    public function index(Request $request)
+{
+    $search = $request->search;
+
+    $tasks = Task::where('user_id', auth()->id())
+        ->when($search, function ($query) use ($search) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('title', 'like', '%' . $search . '%');
+
+            });
+
+        })
+        ->latest()
         ->get();
 
-        return view('tasks.index', compact('tasks'));
-    }
+    return view('tasks.index', compact('tasks', 'search'));
+}
 
     /**
      * Create Task Page

@@ -192,44 +192,26 @@
     <div class="col-lg-6">
 
         <div class="card">
-
-            <div class="card-header">
-
-                <h4 class="card-title mb-0">
-                    Task Status
-                </h4>
-
-            </div>
-
-            <div class="card-body">
-
-                <div id="taskStatusChart" style="height:320px;"></div>
-
-            </div>
-
-        </div>
+    <div class="card-header">
+        <h4 class="card-title">Task Status</h4>
+    </div>
+    <div class="card-body">
+        <div id="taskStatusChart" style="height:320px;"></div>
+    </div>
+</div>
 
     </div>
 
     <div class="col-lg-6">
 
         <div class="card">
-
-            <div class="card-header">
-
-                <h4 class="card-title mb-0">
-                    Task Priority
-                </h4>
-
-            </div>
-
-            <div class="card-body">
-
-                <div id="taskPriorityChart" style="height:320px;"></div>
-
-            </div>
-
-        </div>
+    <div class="card-header">
+        <h4 class="card-title">Task Priority</h4>
+    </div>
+    <div class="card-body">
+        <div id="taskPriorityChart" style="height:320px;"></div>
+    </div>
+</div>
 
     </div>
 
@@ -284,15 +266,11 @@
 
                                     @if($user->status == 'blocked')
 
-                                        <span class="badge bg-danger">
-                                            Blocked
-                                        </span>
+                                        {{ ucfirst($user->status) }}
 
                                     @else
 
-                                        <span class="badge bg-success">
-                                            Active
-                                        </span>
+                                        {{ ucfirst($user->status) }}
 
                                     @endif
 
@@ -332,107 +310,63 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ===========================
-    // TASK STATUS BAR CHART
-    // ===========================
+    const statusEl = document.querySelector("#taskStatusChart");
+    const priorityEl = document.querySelector("#taskPriorityChart");
 
-    var statusChart = new ApexCharts(
-        document.querySelector("#taskStatusChart"),
-        {
-            chart: {
-                type: 'bar',
-                height: 320,
-                toolbar: {
-                    show: false
-                }
-            },
+    statusEl.innerHTML = "";
+    priorityEl.innerHTML = "";
 
-            colors: ['#556ee6'],
+    if (window.statusChart) {
+        window.statusChart.destroy();
+    }
 
-            series: [{
-                name: 'Tasks',
-                data: [
-                    {{ $completedTasks }},
-                    {{ $pendingTasks }}
-                ]
-            }],
+    if (window.priorityChart) {
+        window.priorityChart.destroy();
+    }
 
-            xaxis: {
-                categories: [
-                    'Completed',
-                    'Pending'
-                ]
-            },
-
-            plotOptions: {
-                bar: {
-                    borderRadius: 6,
-                    columnWidth: '45%'
-                }
-            },
-
-            dataLabels: {
-                enabled: true
-            },
-
-            grid: {
-                borderColor: '#f1f1f1'
-            }
+    window.statusChart = new ApexCharts(statusEl, {
+        chart: {
+            type: "bar",
+            height: 320,
+            toolbar: { show: false }
+        },
+        colors: ["#556ee6"],
+        series: [{
+            name: "Tasks",
+            data: [{{ $completedTasks }}, {{ $pendingTasks }}]
+        }],
+        xaxis: {
+            categories: ["Completed", "Pending"]
+        },
+        dataLabels: {
+            enabled: true
         }
-    );
+    });
 
-    statusChart.render();
+    window.statusChart.render();
 
-    // ===========================
-    // TASK PRIORITY PIE CHART
-    // ===========================
-
-    var priorityChart = new ApexCharts(
-        document.querySelector("#taskPriorityChart"),
-        {
-            chart: {
-                type: 'pie',
-                height: 320
-            },
-
-            labels: [
-                'High',
-                'Medium',
-                'Low'
-            ],
-
-            series: [
-                {{ $highPriority }},
-                {{ $mediumPriority }},
-                {{ $lowPriority }}
-            ],
-
-            colors: [
-                '#f46a6a',
-                '#f1b44c',
-                '#34c38f'
-            ],
-
-            legend: {
-                position: 'bottom'
-            },
-
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 300
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
+    window.priorityChart = new ApexCharts(priorityEl, {
+        chart: {
+            type: "pie",
+            height: 320
+        },
+        labels: ["High", "Medium", "Low"],
+        series: [
+            {{ $highPriority }},
+            {{ $mediumPriority }},
+            {{ $lowPriority }}
+        ],
+        colors: [
+            "#f46a6a",
+            "#f1b44c",
+            "#34c38f"
+        ],
+        legend: {
+            position: "bottom"
         }
-    );
+    });
 
-    priorityChart.render();
-
+    window.priorityChart.render();
 });
 
 </script>

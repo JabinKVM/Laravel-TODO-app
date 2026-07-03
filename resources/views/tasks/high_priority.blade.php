@@ -1,108 +1,167 @@
 @extends('layouts.master')
 
+@section('title','High Priority Tasks')
+
 @section('content')
 
-<div class="row mb-4">
+<!-- start page title -->
 
-    <div class="col-md-6">
+<div class="row">
 
-        <h4 class="mb-0">
-            High Priority Tasks
-        </h4>
+    <div class="col-12">
 
-        <p class="text-muted">
-            These tasks require immediate attention.
-        </p>
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+
+            <h4 class="mb-sm-0 font-size-18">
+
+                High Priority Tasks
+
+            </h4>
+
+            <div class="page-title-right">
+
+                <ol class="breadcrumb m-0">
+
+                    <li class="breadcrumb-item">
+
+                        <a href="{{ route('dashboard') }}">
+
+                            Dashboard
+
+                        </a>
+
+                    </li>
+
+                    <li class="breadcrumb-item">
+
+                        Tasks
+
+                    </li>
+
+                    
+
+                </ol>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
 
-<div class="card">
+<!-- end page title -->
 
-    <div class="card-body">
+@if(session('success'))
 
-        <div class="table-responsive">
+<div class="alert alert-success alert-dismissible fade show">
 
-            <table class="table table-hover align-middle">
+    {{ session('success') }}
 
-                <thead class="table-light">
+    <button class="btn-close" data-bs-dismiss="alert"></button>
 
-                <tr>
+</div>
 
-                    <th>SI No.</th>
+@endif
 
-                    <th>Task</th>
+<div class="row">
 
-                    <th>Priority</th>
+    <div class="col-12">
 
-                    <th>Status</th>
+        <div class="card">
 
-                </tr>
+            <div class="card-body">
 
-                </thead>
+                
 
-                <tbody>
+                
 
-                @forelse($tasks as $task)
+                <div class="table-responsive">
 
-                    <tr>
+                    <table class="table table-editable table-nowrap align-middle table-edits">
 
-                        <td>{{ $loop->iteration }}</td>
+                        <thead>
 
-                        <td>{{ $task->title }}</td>
+                            <tr>
 
-                        <td>
+                                <th>ID</th>
 
-                            <span class="badge bg-danger">
+                                <th>Task</th>
 
-                                High
+                                <th>Priority</th>
 
-                            </span>
+                                <th>Status</th>
 
-                        </td>
+                                <th>Edit</th>
 
-                        <td>
+                            </tr>
 
-                            @if($task->completed)
+                        </thead>
 
-                                <span class="badge bg-success">
+                        <tbody>
 
-                                    Completed
+@forelse($tasks as $task)
 
-                                </span>
+<tr data-id="{{ $task->id }}">
 
-                            @else
+    <td data-field="id" style="width:80px">
 
-                                <span class="badge bg-warning text-dark">
+        {{ $loop->iteration }}
 
-                                    Pending
+    </td>
 
-                                </span>
+    <td data-field="name">
 
-                            @endif
+        {{ $task->title }}
 
-                        </td>
+    </td>
 
-                    </tr>
+    <td data-field="age">
 
-                @empty
+        {{ $task->priority }}
 
-                    <tr>
+    </td>
 
-                        <td colspan="4" class="text-center">
+    <td data-field="gender">
 
-                            No High Priority Tasks Found.
+        {{ $task->completed ? 'Completed' : 'Pending' }}
 
-                        </td>
+    </td>
 
-                    </tr>
+    <td style="width:100px">
 
-                @endforelse
+        <a href="{{ route('tasks.edit',$task->id) }}"
+           class="btn btn-outline-secondary btn-sm edit"
+           title="Edit">
 
-                </tbody>
+            <i class="fas fa-pencil-alt"></i>
 
-            </table>
+        </a>
+
+    </td>
+
+</tr>
+@empty
+
+<tr>
+
+    <td colspan="5" class="text-center py-5">
+
+        No High Priority Tasks Found
+
+    </td>
+
+</tr>
+
+@endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
 
         </div>
 

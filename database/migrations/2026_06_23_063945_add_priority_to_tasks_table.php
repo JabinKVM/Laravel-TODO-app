@@ -6,23 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::table('tasks', function ($table) {
-        $table->string('priority')->default('Medium');
-    });
-}
+    {
+        Schema::table('tasks', function (Blueprint $table) {
 
-    /**
-     * Reverse the migrations.
-     */
+            $table->enum('priority', [
+                'High',
+                'Medium',
+                'Low'
+            ])->default('Medium');
+
+        });
+    }
+
     public function down(): void
-{
-    Schema::table('tasks', function ($table) {
-        $table->dropColumn('priority');
-    });
-}
+    {
+        Schema::table('tasks', function (Blueprint $table) {
+
+            $table->dropColumn('priority');
+
+        });
+    }
 };

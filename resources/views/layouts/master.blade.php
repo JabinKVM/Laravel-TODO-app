@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
 
 @include('layouts.head')
@@ -33,7 +34,6 @@
 
 @include('layouts.scripts')
 
-@stack('scripts')
-
 </body>
+
 </html>
