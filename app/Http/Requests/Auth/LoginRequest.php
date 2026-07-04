@@ -52,16 +52,18 @@ class LoginRequest extends FormRequest
     }
 
     // Check if the authenticated user is blocked
-    if (Auth::user()->status === 'blocked') {
+    if (Auth::user()->status === 'Blocked') {
 
         Auth::logout();
+
+        RateLimiter::clear($this->throttlekey());
 
         throw ValidationException::withMessages([
             'email' => 'Your account has been blocked by the administrator. Please contact support.',
         ]);
     }
 
-    RateLimiter::clear($this->throttleKey());
+
 }
 
     /**

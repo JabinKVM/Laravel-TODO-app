@@ -74,6 +74,45 @@
                     </ul>
 
                 </li>
+                <!-- ================= Students ================= -->
+                <li class="menu-title" key="t-tasks">
+                    Student Management
+                </li>
+                <li>
+
+                    <a href="javascript:void(0);" class="has-arrow waves-effect">
+
+                        <i class="bx bx-user"></i>
+
+                        <span>Students</span>
+
+                    </a>
+
+                    <ul class="sub-menu" aria-expanded="false">
+
+                        <li>
+
+                        <a href="{{ route('students.index') }}">
+
+                             Student Management
+
+                        </a>
+
+                        </li>
+
+                        <li>
+
+                            <a href="{{ route('students.create') }}">
+
+                                Register Student
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </li>
 
                 <!-- ================= SETTINGS ================= -->
 

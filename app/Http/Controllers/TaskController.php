@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
+
 
 class TaskController extends Controller
 {
@@ -89,13 +91,38 @@ class TaskController extends Controller
     /**
      * Edit Task
      */
-    public function edit($id)
-    {
-        $task = Task::where('user_id', auth()->id())
-            ->findOrFail($id);
-
-        return view('tasks.edit', compact('task'));
+    
+    public function inlineUpdate(Request $request, Task $task)
+{
+    // Make sure the task belongs to the logged-in user
+    if ($task->user_id != Auth::id()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
     }
+
+    // Validate input
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'priority' => 'required|in:Low,Medium,High',
+        'completed' => 'required|boolean',
+    ]);
+
+    // Update task
+    $task->update($validated);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Task updated successfully.',
+        'task' => [
+            'id' => $task->id,
+            'title' => $task->title,
+            'priority' => $task->priority,
+            'completed' => $task->completed,
+        ]
+    ]);
+}
 
     /**
      * Update Task
@@ -186,4 +213,22 @@ class TaskController extends Controller
 
         return view('tasks.high_priority', compact('tasks'));
     }
+    public function ajaxDelete(Task $task)
+{
+    if ($task->user_id != Auth::id()) {
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
+
+    }
+
+    $task->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Task deleted successfully.'
+    ]);
+}
 }

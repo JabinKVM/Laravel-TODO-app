@@ -102,12 +102,11 @@
                         aria-haspopup="true"
                         aria-expanded="false">
 
-                   <img
-    class="rounded-circle header-profile-user"
-    src="{{ Auth::user()->profile_photo
-            ? asset('storage/' . Auth::user()->profile_photo)
-            : asset('assets/images/users/avatar-1.jpg') }}"
-    alt="{{ Auth::user()->name }}">
+                   <img class="rounded-circle header-profile-user"
+                        src="{{ Auth::user()->profile_photo
+                        ? asset('storage/' . Auth::user()->profile_photo)
+                        : asset('assets/images/users/avatar-1.jpg') }}"
+                        alt="Profile">
 
                     <span class="d-none d-xl-inline-block ms-2">
 

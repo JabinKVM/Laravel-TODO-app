@@ -1,20 +1,37 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentController;
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/dashboard', [TaskController::class, 'dashboard'])
         ->name('dashboard');
 
-    // Tasks
+    /*
+    |--------------------------------------------------------------------------
+    | Task Management
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/tasks', [TaskController::class, 'index'])
         ->name('tasks.index');
 
@@ -24,8 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks', [TaskController::class, 'store'])
         ->name('tasks.store');
 
-    Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])
-        ->name('tasks.edit');
+    
 
     Route::put('/tasks/{id}', [TaskController::class, 'update'])
         ->name('tasks.update');
@@ -36,20 +52,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{id}/complete', [TaskController::class, 'complete'])
         ->name('tasks.complete');
 
-    // Pending Tasks
+    Route::put('/tasks/{task}/inline-update', [TaskController::class, 'inlineUpdate'])
+        ->name('tasks.inline-update');
+
+    Route::delete('/tasks/{task}/ajax-delete', [TaskController::class, 'ajaxDelete'])
+        ->name('tasks.ajax-delete');
+
     Route::get('/tasks/pending', [TaskController::class, 'pending'])
         ->name('tasks.pending');
 
-    // Completed Tasks
     Route::get('/tasks/completed', [TaskController::class, 'completed'])
         ->name('tasks.completed');
 
-    // High Priority Tasks
     Route::get('/tasks/high-priority', [TaskController::class, 'highPriority'])
         ->name('tasks.high-priority');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])
-    ->name('tasks.destroy');
-    // Profile
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
@@ -58,42 +81,62 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
-    Route::middleware([
-         'auth',
-        'blocked',
-        'admin'
-        ])->prefix('admin')
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware(['blocked', 'admin'])
+        ->prefix('admin')
         ->group(function () {
 
-    Route::get(
-        '/',
-        [AdminController::class,'dashboard']
-    )->name('admin.dashboard');
+            Route::get('/', [AdminController::class, 'dashboard'])
+                ->name('admin.dashboard');
 
-    Route::get(
-        '/users',
-        [AdminController::class,'users']
-    )->name('admin.users');
-    Route::get(
-    '/users/{user}',
-    [AdminController::class, 'show']
-)->name('admin.show');
-    Route::patch(
-        '/users/{user}/block',
-        [AdminController::class,'block']
-    )->name('admin.block');
+            Route::get('/users', [AdminController::class, 'users'])
+                ->name('admin.users');
 
-    Route::patch(
-        '/users/{user}/unblock',
-        [AdminController::class,'unblock']
-    )->name('admin.unblock');
+            Route::get('/users/{user}', [AdminController::class, 'show'])
+                ->name('admin.show');
 
-    Route::delete(
-        '/users/{user}',
-        [AdminController::class,'destroy']
-    )->name('admin.delete');
+            Route::patch('/users/{user}/block', [AdminController::class, 'block'])
+                ->name('admin.block');
 
-});
-});
+            Route::patch('/users/{user}/unblock', [AdminController::class, 'unblock'])
+                ->name('admin.unblock');
 
-require __DIR__.'/auth.php';
+            Route::delete('/users/{user}', [AdminController::class, 'destroy'])
+                ->name('admin.delete');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Student Management
+    |--------------------------------------------------------------------------
+    */
+
+             Route::get('/students', [StudentController::class, 'index'])
+                ->name('students.index');
+
+            Route::get('/students/create', [StudentController::class, 'create'])
+               ->name('students.create');
+
+            Route::post('/students', [StudentController::class, 'store'])
+                ->name('students.store');
+
+            Route::get('/students/{student}', [StudentController::class, 'show'])
+                ->name('students.show');
+
+            Route::get('/students/{student}/edit', [StudentController::class, 'edit'])
+                ->name('students.edit');
+
+            Route::put('/students/{student}', [StudentController::class, 'update'])
+                ->name('students.update');
+
+            Route::delete('/students/{student}', [StudentController::class, 'destroy'])
+                ->name('students.destroy');
+    });
+
+require __DIR__ . '/auth.php';

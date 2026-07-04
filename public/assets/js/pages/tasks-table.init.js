@@ -1,38 +1,46 @@
-$(document).ready(function () {
+$(function () {
 
-    $('.datatable').DataTable({
+    if ($('.datatable').length) {
 
-        responsive: true,
-        pageLength: 10,
+        $('.datatable').DataTable({
 
-        lengthMenu: [
-            [10, 25, 50, 100],
-            [10, 25, 50, 100]
-        ],
+            responsive: true,
 
-        ordering: false,
-        searching: true,
-        info: true,
-        autoWidth: false,
+            pageLength: 10,
 
-        language: {
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
 
-            search: "Search:",
+            ordering: false,
 
-            lengthMenu: "Show _MENU_ entries",
+            searching: true,
 
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            info: true,
 
-            paginate: {
+            autoWidth: false,
 
-                previous: "Previous",
+            language: {
 
-                next: "Next"
+                search: "Search:",
+
+                lengthMenu: "Show _MENU_ entries",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+
+                paginate: {
+
+                    previous: "Previous",
+
+                    next: "Next"
+
+                }
 
             }
 
-        }
+        });
 
-    });
+    }
 
 });

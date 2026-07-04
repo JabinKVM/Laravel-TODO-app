@@ -1,3 +1,5 @@
+<!-- JAVASCRIPT -->
+
 <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}"></script>
 
 <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -7,6 +9,10 @@
 <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}"></script>
 
 <script src="{{ asset('assets/libs/node-waves/waves.min.js') }}"></script>
+
+<!-- SweetAlert2 -->
+
+<script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
 <!-- DataTables -->
 
@@ -22,6 +28,16 @@
 
 <script src="{{ asset('assets/js/app.js') }}"></script>
 
-<!-- YOUR TABLE -->
+<!-- Generic DataTable -->
 
 <script src="{{ asset('assets/js/pages/tasks-table.init.js') }}"></script>
+
+<!-- Task Inline Edit -->
+
+<script src="{{ asset('assets/js/tasks/inline-edit.js') }}"></script>
+
+<!-- User Management -->
+
+<script src="{{ asset('assets/js/admin/users.js') }}"></script>
+
+@stack('scripts')

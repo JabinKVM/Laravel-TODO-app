@@ -131,34 +131,28 @@
 
     <td style="width:100px">
 
-        <a href="{{ route('tasks.edit',$task->id) }}"
-           class="btn btn-outline-secondary btn-sm edit"
-           title="Edit">
+        <button
+    class="btn btn-outline-secondary btn-sm edit-task"
+    data-id="{{ $task->id }}"
+    title="Edit">
 
-            <i class="fas fa-pencil-alt"></i>
+    <i class="fas fa-pencil-alt"></i>
 
-        </a>
+</button>
 
     </td>
 
 </tr>
 @empty
 
-<tr>
 
-    <td colspan="5" class="text-center py-5">
-
-        No High Priority Tasks Found
-
-    </td>
-
-</tr>
 
 @endforelse
 
                         </tbody>
 
                     </table>
+                    
 
                 </div>
 
