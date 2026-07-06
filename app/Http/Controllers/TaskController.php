@@ -53,13 +53,13 @@ class TaskController extends Controller
             });
 
         })
-        ->latest()
+        ->oldest()
         ->get();
 
     return view('tasks.index', compact('tasks', 'search'));
 }
 
-    /**
+        /**
      * Create Task Page
      */
     public function create()

@@ -12,7 +12,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::latest()->paginate(10);
+        $students = Student::orderBy('id','asc')->paginate(10);
 
         return view('students.index', compact('students'));
     }
