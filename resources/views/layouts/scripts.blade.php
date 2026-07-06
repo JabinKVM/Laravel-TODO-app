@@ -35,6 +35,8 @@
 <!-- Task Inline Edit -->
 
 <script src="{{ asset('assets/js/tasks/inline-edit.js') }}"></script>
+<!---Student Management -->
+<script src="{{ asset('assets/js/students/students.js') }}"></script>
 
 <!-- User Management -->
 

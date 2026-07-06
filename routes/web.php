@@ -137,6 +137,11 @@ Route::middleware(['auth'])->group(function () {
 
             Route::delete('/students/{student}', [StudentController::class, 'destroy'])
                 ->name('students.destroy');
+            Route::put('/students/{student}/inline-update', [StudentController::class, 'inlineUpdate'])
+                ->name('students.inlineUpdate');
+
+            Route::delete('/students/{student}/ajax-delete', [StudentController::class, 'ajaxDelete'])
+                ->name('students.ajaxDelete');
     });
 
 require __DIR__ . '/auth.php';

@@ -69,100 +69,96 @@ Student Management
 
                 <tbody>
 
-                @forelse($students as $student)
+@forelse($students as $student)
 
-                    <tr>
+<tr id="student-row-{{ $student->id }}"
+    data-id="{{ $student->id }}">
 
-                        <td style="width:80px">
+    <td class="student-id" style="width:80px">
 
-                            {{ $loop->iteration }}
+        {{ $loop->iteration }}
 
-                        </td>
+    </td>
 
-                        <td>
+    <td class="student-student-id">
 
-                            {{ $student->student_id }}
+        {{ $student->student_id }}
 
-                        </td>
+    </td>
 
-                        <td>
+    <td class="student-name">
 
-                            {{ $student->name }}
+        {{ $student->name }}
 
-                        </td>
+    </td>
 
-                        <td>
+    <td class="student-email">
 
-                            {{ $student->email }}
+        {{ $student->email }}
 
-                        </td>
+    </td>
 
-                        <td>
+    <td class="student-department">
 
-                            {{ $student->department }}
+        {{ $student->department }}
 
-                        </td>
+    </td>
 
-                        <td>
+    <td class="student-status">
 
-                            {{ $student->status }}
+        @if($student->status == 'Active')
 
-                        </td>
+            <span class="badge bg-success">
 
-                        <td style="width:150px">
+                Active
 
-                            <!-- View -->
+            </span>
 
-                            <a href="{{ route('students.show',$student->id) }}"
-                               class="btn btn-outline-secondary btn-sm"
-                               title="View Student">
+        @else
 
-                                <i class="fas fa-eye"></i>
+            <span class="badge bg-danger">
 
-                            </a>
+                Inactive
 
-                            <!-- Edit -->
+            </span>
 
-                            <a href="{{ route('students.edit',$student->id) }}"
-                               class="btn btn-outline-secondary btn-sm"
-                               title="Edit Student">
+        @endif
 
-                                <i class="fas fa-pencil-alt"></i>
+    </td>
 
-                            </a>
+    <td class="student-actions text-center">
 
-                            <!-- Delete -->
+        <!-- View -->
 
-                            <form action="{{ route('students.destroy',$student->id) }}"
-                                  method="POST"
-                                  class="d-inline">
+        <a href="{{ route('students.show', $student->id) }}"
+           class="btn btn-outline-secondary btn-sm"
+           title="View Student">
 
-                                @csrf
-                                @method('DELETE')
+            <i class="fas fa-eye"></i>
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-outline-secondary btn-sm"
-                                    onclick="return confirm('Delete this student?')"
-                                    title="Delete Student">
+        </a>
 
-                                    <i class="fas fa-trash"></i>
+        <!-- Edit -->
 
-                                </button>
+        <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm edit-student"
+            data-id="{{ $student->id }}"
+            title="Edit Student">
 
-                            </form>
+            <i class="fas fa-pencil-alt"></i>
 
-                        </td>
+        </button>
 
-                    </tr>
+    </td>
 
-                @empty
-                    
-                    
+</tr>
 
-                @endforelse
+@empty
 
-                </tbody>
+@endforelse
+
+</tbody>
 
             </table>
 

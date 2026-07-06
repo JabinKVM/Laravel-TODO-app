@@ -134,4 +134,35 @@ class StudentController extends Controller
             ->route('students.index')
             ->with('success', 'Student deleted successfully.');
     }
+    public function inlineUpdate(Request $request, Student $student)
+    {
+         $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email,' . $student->id,
+            'department' => 'required|string|max:255',
+            'status' => 'required|in:Active,Inactive',
+            ]);
+
+        $student->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'department' => $request->department,
+            'status' => $request->status,
+             ]);
+
+        return response()->json([
+         'success' => true,
+            'message' => 'Student updated successfully.',
+            'student' => $student
+        ]);
+        }
+        public function ajaxDelete(Student $student)
+        {
+            $student->delete();
+
+            return response()->json([
+             'success' => true,
+              'message' => 'Student deleted successfully.'
+                ]);
+}
 }
