@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Student extends Model
+class School extends Model
 {
     use HasFactory;
 
@@ -16,25 +16,13 @@ class Student extends Model
 
         'user_id',
 
-        'school_id',
-
-        'student_id',
-
         'name',
 
         'email',
 
         'phone',
 
-        'gender',
-
-        'dob',
-
-        'department',
-
         'address',
-
-        'profile_photo',
 
         'status',
 
@@ -44,8 +32,6 @@ class Student extends Model
      * Attribute Casting
      */
     protected $casts = [
-
-        'dob' => 'date',
 
         'status' => 'boolean',
 
@@ -66,11 +52,11 @@ class Student extends Model
     }
 
     /**
-     * School
+     * Students
      */
-    public function school()
+    public function students()
     {
-        return $this->belongsTo(School::class);
+        return $this->hasMany(Student::class);
     }
 
 }

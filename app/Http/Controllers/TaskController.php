@@ -2,233 +2,263 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use App\Models\School;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Task;
-
 
 class TaskController extends Controller
 {
-    /**
-     * Dashboard
-     */
-    public function dashboard()
+
+    /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Assigned Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    public function index()
     {
-        $totalTasks = Task::where('user_id', auth()->id())->count();
+        $school = Auth::user()->school;
 
-        $completedTasks = Task::where('user_id', auth()->id())
-            ->where('completed', true)
-            ->count();
+        $tasks = Task::with('user')
 
-        $pendingTasks = Task::where('user_id', auth()->id())
-            ->where('completed', false)
-            ->count();
+            ->where('created_by', Auth::id())
 
-        $highPriorityTasks = Task::where('user_id', auth()->id())
-            ->where('priority', 'High')
-            ->count();
+            ->latest()
 
-        return view('dashboard', compact(
-            'totalTasks',
-            'completedTasks',
-            'pendingTasks',
-            'highPriorityTasks'
-        ));
+            ->paginate(10);
+
+        return view('school.tasks.index', compact('tasks'));
     }
 
-    /**
-     * All Tasks
-     */
-    public function index(Request $request)
-{
-    $search = $request->search;
+    /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Create Task
+    |--------------------------------------------------------------------------
+    */
 
-    $tasks = Task::where('user_id', auth()->id())
-        ->when($search, function ($query) use ($search) {
-
-            $query->where(function ($q) use ($search) {
-
-                $q->where('title', 'like', '%' . $search . '%');
-
-            });
-
-        })
-        ->oldest()
-        ->get();
-
-    return view('tasks.index', compact('tasks', 'search'));
-}
-
-        /**
-     * Create Task Page
-     */
     public function create()
     {
-        return view('tasks.create');
+        $school = Auth::user()->school;
+
+        $students = Student::where('school_id', $school->id)
+            ->where('status',1)
+            ->orderBy('name')
+            ->get();
+
+        return view('school.tasks.create', compact('students'));
     }
 
-    /**
-     * Store Task
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Store Task
+    |--------------------------------------------------------------------------
+    */
+
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|max:255',
-            'priority' => 'required'
+
+            'user_id'=>'required|exists:users,id',
+
+            'title'=>'required|max:255',
+
+            'description'=>'nullable',
+
+            'priority'=>'required|in:Low,Medium,High',
+
+            'due_date'    => 'nullable|date',
+
         ]);
 
         Task::create([
-            'user_id' => auth()->id(),
-            'title' => $request->title,
-            'priority' => $request->priority,
-            'completed' => false
+
+            'user_id'=>$request->user_id,
+
+            'created_by'=>Auth::id(),
+
+            'title'=>$request->title,
+
+            'description'=>$request->description,
+
+            'priority'=>$request->priority,
+
+            'due_date'    => $request->due_date,
+
+            'completed'=>false
+
         ]);
 
-        return redirect()->route('tasks.index')
-            ->with('success', 'Task created successfully.');
+        return redirect()
+
+            ->route('school.tasks.index')
+
+            ->with('success','Task assigned successfully.');
+    }
+        /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Edit Task
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit($id)
+    {
+        $task = Task::findOrFail($id);
+
+        if ($task->created_by != Auth::id()) {
+            abort(403);
+        }
+
+        $school = Auth::user()->school;
+
+        $students = Student::where('school_id', $school->id)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        return view('school.tasks.edit', compact('task', 'students'));
     }
 
-    /**
-     * Edit Task
-     */
-    
-    public function inlineUpdate(Request $request, Task $task)
-{
-    // Make sure the task belongs to the logged-in user
-    if ($task->user_id != Auth::id()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized.'
-        ], 403);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Update Task
+    |--------------------------------------------------------------------------
+    */
 
-    // Validate input
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'priority' => 'required|in:Low,Medium,High',
-        'completed' => 'required|boolean',
-    ]);
-
-    // Update task
-    $task->update($validated);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Task updated successfully.',
-        'task' => [
-            'id' => $task->id,
-            'title' => $task->title,
-            'priority' => $task->priority,
-            'completed' => $task->completed,
-        ]
-    ]);
-}
-
-    /**
-     * Update Task
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|max:255',
-            'priority' => 'required'
+
+            'user_id'     => 'required|exists:users,id',
+
+            'title'       => 'required|max:255',
+
+            'description' => 'nullable',
+
+            'priority'    => 'required|in:Low,Medium,High',
+            
+            'due_date' => 'nullable|date',
+
         ]);
 
-        $task = Task::where('user_id', auth()->id())
-            ->findOrFail($id);
+        $task = Task::findOrFail($id);
+
+        if ($task->created_by != Auth::id()) {
+            abort(403);
+        }
 
         $task->update([
-            'title' => $request->title,
-            'priority' => $request->priority,
+
+            'user_id'     => $request->user_id,
+
+            'title'       => $request->title,
+
+            'description' => $request->description,
+
+            'priority'    => $request->priority
+
         ]);
 
-        return redirect()->route('tasks.index')
+        return redirect()
+
+            ->route('school.tasks.index')
+
             ->with('success', 'Task updated successfully.');
     }
 
-    /**
-     * Complete Task
-     */
-    public function complete($id)
-    {
-        $task = Task::where('user_id', auth()->id())
-            ->findOrFail($id);
+    /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - Delete Task
+    |--------------------------------------------------------------------------
+    */
 
-        $task->completed = true;
-        $task->save();
-
-        return redirect()->route('tasks.index')
-            ->with('success', 'Task completed.');
-    }
-
-    /**
-     * Delete Task
-     */
     public function destroy($id)
     {
-        $task = Task::where('user_id', auth()->id())
-            ->findOrFail($id);
+        $task = Task::findOrFail($id);
+
+        if ($task->created_by != Auth::id()) {
+            abort(403);
+        }
 
         $task->delete();
 
-        return redirect()->route('tasks.index')
-            ->with('success', 'Task deleted.');
-    }
+        return redirect()
 
-    /**
-     * Pending Tasks
-     */
-    public function pending()
+            ->route('school.tasks.index')
+
+            ->with('success', 'Task deleted successfully.');
+    }
+        /*
+    |--------------------------------------------------------------------------
+    | STUDENT - My Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    public function myTasks()
     {
-        $tasks = Task::where('user_id', auth()->id())
-            ->where('completed', false)
+        $tasks = Task::where('user_id', Auth::id())
             ->latest()
-            ->get();
+            ->paginate(10);
 
-        return view('tasks.pending', compact('tasks'));
+        return view('student.tasks.index', compact('tasks'));
     }
 
-    /**
-     * Completed Tasks
-     */
-    public function completed()
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - View Single Task
+    |--------------------------------------------------------------------------
+    */
+
+    public function show($id)
     {
-        $tasks = Task::where('user_id', auth()->id())
-            ->where('completed', true)
-            ->latest()
-            ->get();
+        $task = Task::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        return view('tasks.completed', compact('tasks'));
+        return view('student.tasks.show', compact('task'));
     }
 
-    /**
-     * High Priority Tasks
-     */
-    public function highPriority()
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - Mark Complete
+    |--------------------------------------------------------------------------
+    */
+
+    public function complete($id)
     {
-        $tasks = Task::where('user_id', auth()->id())
-            ->where('priority', 'High')
-            ->latest()
-            ->get();
+        $task = Task::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        return view('tasks.high_priority', compact('tasks'));
-    }
-    public function ajaxDelete(Task $task)
-{
-    if ($task->user_id != Auth::id()) {
+        $task->completed = true;
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized.'
-        ], 403);
+        $task->save();
 
+        return redirect()
+            ->back()
+            ->with('success', 'Task marked as completed.');
     }
 
-    $task->delete();
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - Mark Pending Again
+    |--------------------------------------------------------------------------
+    */
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Task deleted successfully.'
-    ]);
-}
+    public function pending($id)
+    {
+        $task = Task::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $task->completed = false;
+
+        $task->save();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Task marked as pending.');
+    }
+
 }

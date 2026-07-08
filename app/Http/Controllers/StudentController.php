@@ -2,167 +2,115 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
-use Illuminate\Http\Request;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
-    /**
-     * Display all students.
-     */
-    public function index()
-    {
-        $students = Student::orderBy('id','asc')->paginate(10);
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
 
-        return view('students.index', compact('students'));
+    public function dashboard()
+    {
+        $totalTasks = Task::where('user_id', Auth::id())->count();
+
+        $completedTasks = Task::where('user_id', Auth::id())
+            ->where('completed', true)
+            ->count();
+
+        $pendingTasks = Task::where('user_id', Auth::id())
+            ->where('completed', false)
+            ->count();
+
+        $highPriorityTasks = Task::where('user_id', Auth::id())
+            ->where('priority', 'High')
+            ->count();
+
+        $recentTasks = Task::where('user_id', Auth::id())
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('student.dashboard', compact(
+            'totalTasks',
+            'completedTasks',
+            'pendingTasks',
+            'highPriorityTasks',
+            'recentTasks'
+        ));
     }
 
-    /**
-     * Show registration form.
-     */
-    public function create()
+    /*
+    |--------------------------------------------------------------------------
+    | My Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    public function myTasks()
     {
-        return view('students.create');
+        $tasks = Task::where('user_id', Auth::id())
+            ->latest()
+            ->paginate(10);
+
+        return view('student.tasks.index', compact('tasks'));
     }
 
-    /**
-     * Store new student.
-     */
-    public function store(Request $request)
+    /*
+    |--------------------------------------------------------------------------
+    | View Task
+    |--------------------------------------------------------------------------
+    */
+
+    public function show(Task $task)
     {
-        $validated = $request->validate([
-
-            'student_id'    => 'required|unique:students',
-
-            'name'          => 'required|string|max:255',
-
-            'email'         => 'required|email|unique:students',
-
-            'phone'         => 'required',
-
-            'dob'           => 'required|date',
-
-            'gender'        => 'required',
-
-            'department'    => 'required',
-
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
-            'status'        => 'required'
-
-        ]);
-
-        if ($request->hasFile('profile_photo')) {
-
-            $validated['profile_photo'] =
-                $request->file('profile_photo')
-                        ->store('students', 'public');
+        if ($task->user_id != Auth::id()) {
+            abort(403);
         }
 
-        Student::create($validated);
-
-        return redirect()
-            ->route('students.index')
-            ->with('success', 'Student registered successfully.');
+        return view('student.tasks.show', compact('task'));
     }
+        /*
+    |--------------------------------------------------------------------------
+    | Mark Task as Completed
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * Show student details.
-     */
-    public function show(Student $student)
+    public function complete(Task $task)
     {
-        return view('students.show', compact('student'));
-    }
-
-    /**
-     * Edit student.
-     */
-    public function edit(Student $student)
-    {
-        return view('students.edit', compact('student'));
-    }
-
-    /**
-     * Update student.
-     */
-    public function update(Request $request, Student $student)
-    {
-        $validated = $request->validate([
-
-            'student_id' => 'required|unique:students,student_id,' . $student->id,
-
-            'name' => 'required|string|max:255',
-
-            'email' => 'required|email|unique:students,email,' . $student->id,
-
-            'phone' => 'required',
-
-            'dob' => 'required|date',
-
-            'gender' => 'required',
-
-            'department' => 'required',
-
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
-            'status' => 'required'
-
-        ]);
-
-        if ($request->hasFile('profile_photo')) {
-
-            $validated['profile_photo'] =
-                $request->file('profile_photo')
-                        ->store('students', 'public');
+        if ($task->user_id != Auth::id()) {
+            abort(403);
         }
 
-        $student->update($validated);
-
-        return redirect()
-            ->route('students.index')
-            ->with('success', 'Student updated successfully.');
-    }
-
-    /**
-     * Delete student.
-     */
-    public function destroy(Student $student)
-    {
-        $student->delete();
-
-        return redirect()
-            ->route('students.index')
-            ->with('success', 'Student deleted successfully.');
-    }
-    public function inlineUpdate(Request $request, Student $student)
-    {
-         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email,' . $student->id,
-            'department' => 'required|string|max:255',
-            'status' => 'required|in:Active,Inactive',
-            ]);
-
-        $student->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'department' => $request->department,
-            'status' => $request->status,
-             ]);
-
-        return response()->json([
-         'success' => true,
-            'message' => 'Student updated successfully.',
-            'student' => $student
+        $task->update([
+            'completed' => true,
         ]);
-        }
-        public function ajaxDelete(Student $student)
-        {
-            $student->delete();
 
-            return response()->json([
-             'success' => true,
-              'message' => 'Student deleted successfully.'
-                ]);
-}
+        return redirect()
+            ->route('student.tasks')
+            ->with('success', 'Task marked as completed successfully.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mark Task as Pending Again
+    |--------------------------------------------------------------------------
+    */
+
+    public function pending(Task $task)
+    {
+        if ($task->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        $task->update([
+            'completed' => false,
+        ]);
+
+        return redirect()
+            ->route('student.tasks')
+            ->with('success', 'Task marked as pending.');
+    }
 }

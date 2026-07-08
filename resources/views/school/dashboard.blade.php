@@ -27,11 +27,11 @@
 
 </div>
 
-<!-- Statistics Cards -->
+<!-- Statistics -->
 
 <div class="row">
 
-    <!-- Total Tasks -->
+    <!-- Total Students -->
 
     <div class="col-xl-3 col-md-6">
 
@@ -44,12 +44,12 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-                            Total Tasks
+                            Total Students
                         </p>
 
                         <h3 class="mb-0">
 
-                            {{ $totalTasks }}
+                            {{ $totalStudents }}
 
                         </h3>
 
@@ -59,7 +59,7 @@
 
                         <span class="avatar-title rounded-circle bg-primary">
 
-                            <i class="bx bx-list-ul font-size-24"></i>
+                            <i class="bx bx-user font-size-24"></i>
 
                         </span>
 
@@ -73,7 +73,7 @@
 
     </div>
 
-    <!-- Completed -->
+    <!-- Active Students -->
 
     <div class="col-xl-3 col-md-6">
 
@@ -86,12 +86,12 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-                            Completed
+                            Active Students
                         </p>
 
                         <h3 class="mb-0 text-success">
 
-                            {{ $completedTasks }}
+                            {{ $activeStudents }}
 
                         </h3>
 
@@ -101,7 +101,7 @@
 
                         <span class="avatar-title rounded-circle bg-success">
 
-                            <i class="bx bx-check-circle font-size-24"></i>
+                            <i class="bx bx-user-check font-size-24"></i>
 
                         </span>
 
@@ -115,7 +115,7 @@
 
     </div>
 
-    <!-- Pending -->
+    <!-- Blocked Students -->
 
     <div class="col-xl-3 col-md-6">
 
@@ -128,12 +128,12 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-                            Pending
+                            Blocked Students
                         </p>
 
                         <h3 class="mb-0 text-warning">
 
-                            {{ $pendingTasks }}
+                            {{ $blockedStudents }}
 
                         </h3>
 
@@ -143,7 +143,7 @@
 
                         <span class="avatar-title rounded-circle bg-warning">
 
-                            <i class="bx bx-time-five font-size-24"></i>
+                            <i class="bx bx-user-x font-size-24"></i>
 
                         </span>
 
@@ -157,7 +157,7 @@
 
     </div>
 
-    <!-- High Priority -->
+    <!-- Assigned Tasks -->
 
     <div class="col-xl-3 col-md-6">
 
@@ -170,12 +170,12 @@
                     <div class="flex-grow-1">
 
                         <p class="text-muted fw-medium">
-                            High Priority
+                            Assigned Tasks
                         </p>
 
                         <h3 class="mb-0 text-danger">
 
-                            {{ $highPriorityTasks }}
+                            {{ $assignedTasks }}
 
                         </h3>
 
@@ -185,7 +185,7 @@
 
                         <span class="avatar-title rounded-circle bg-danger">
 
-                            <i class="bx bx-error font-size-24"></i>
+                            <i class="bx bx-task font-size-24"></i>
 
                         </span>
 
@@ -212,22 +212,23 @@
             <div class="card-body">
 
                 <h4 class="card-title">
-                    Welcome to TodoPro 🚀
+
+                    Welcome to School Dashboard 🎓
+
                 </h4>
 
                 <p class="text-muted">
 
-                    TodoPro helps you organize your daily work efficiently.
-                    Use the sidebar to create, edit, complete and manage your tasks.
+                    Register students, manage their details, assign tasks and monitor their progress.
 
                 </p>
 
-                <a href="{{ route('tasks.create') }}"
+                <a href="{{ route('school.students.create') }}"
                    class="btn btn-primary">
 
                     <i class="bx bx-plus"></i>
 
-                    Create New Task
+                    Register Student
 
                 </a>
 
@@ -243,17 +244,17 @@
 
             <div class="card-body text-center">
 
-                <i class="bx bx-task display-4 mb-3"></i>
+                <i class="bx bx-user display-4 mb-3"></i>
 
                 <h3>
 
-                    {{ $totalTasks }}
+                    {{ $totalStudents }}
 
                 </h3>
 
                 <p class="mb-0">
 
-                    Total Tasks Created
+                    Total Students
 
                 </p>
 
@@ -289,12 +290,12 @@
 
                     <div class="col-md-3">
 
-                        <a href="{{ route('tasks.index') }}"
+                        <a href="{{ route('school.students') }}"
                            class="btn btn-outline-primary w-100 mb-3">
 
-                            <i class="bx bx-list-ul"></i><br>
+                            <i class="bx bx-group"></i><br>
 
-                            All Tasks
+                            Students
 
                         </a>
 
@@ -302,12 +303,25 @@
 
                     <div class="col-md-3">
 
-                        <a href="{{ route('tasks.pending') }}"
+                        <a href="{{ route('school.students.create') }}"
+                           class="btn btn-outline-success w-100 mb-3">
+
+                            <i class="bx bx-user-plus"></i><br>
+
+                            Register Student
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <a href="#"
                            class="btn btn-outline-warning w-100 mb-3">
 
-                            <i class="bx bx-time-five"></i><br>
+                            <i class="bx bx-task"></i><br>
 
-                            Pending Tasks
+                            Assign Task
 
                         </a>
 
@@ -315,25 +329,12 @@
 
                     <div class="col-md-3">
 
-                        <a href="{{ route('tasks.completed') }}"
-                           class="btn btn-outline-success w-100 mb-3">
+                        <a href="#"
+                           class="btn btn-outline-danger w-100 mb-3">
 
                             <i class="bx bx-check-circle"></i><br>
 
                             Completed Tasks
-
-                        </a>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <a href="{{ route('tasks.high-priority') }}"
-                           class="btn btn-outline-danger w-100 mb-3">
-
-                            <i class="bx bx-error"></i><br>
-
-                            High Priority
 
                         </a>
 

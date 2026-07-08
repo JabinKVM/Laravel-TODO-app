@@ -1,12 +1,14 @@
 @extends('layouts.master')
 
+@section('title','Admin Dashboard')
+
 @section('content')
 
-<div class="row">
+<div class="row mb-4">
 
     <div class="col-12">
 
-        <div class="page-title-box d-flex align-items-center justify-content-between">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
             <div>
 
@@ -15,8 +17,11 @@
                 </h4>
 
                 <p class="text-muted mb-0">
+
                     Welcome back,
+
                     <strong>{{ Auth::user()->name }}</strong>
+
                 </p>
 
             </div>
@@ -27,206 +32,175 @@
 
 </div>
 
-{{-- Statistics --}}
+
+@if(session('success'))
+
+<div class="alert alert-success alert-dismissible fade show">
+
+    {{ session('success') }}
+
+    <button class="btn-close"
+            data-bs-dismiss="alert"></button>
+
+</div>
+
+@endif
+
+
+@if(session('error'))
+
+<div class="alert alert-danger alert-dismissible fade show">
+
+    {{ session('error') }}
+
+    <button class="btn-close"
+            data-bs-dismiss="alert"></button>
+
+</div>
+
+@endif
+
 
 <div class="row">
 
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card mini-stats-wid">
-
-            <div class="card-body">
-
-                <div class="d-flex">
-
-                    <div class="flex-grow-1">
-
-                        <p class="text-muted fw-medium">
-                            Total Users
-                        </p>
-
-                        <h3>
-                            {{ $totalUsers }}
-                        </h3>
-
-                    </div>
-
-                    <div class="avatar-sm rounded-circle bg-primary align-self-center">
-
-                        <span class="avatar-title rounded-circle bg-primary">
-
-                            <i class="bx bx-user font-size-24"></i>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card mini-stats-wid">
-
-            <div class="card-body">
-
-                <div class="d-flex">
-
-                    <div class="flex-grow-1">
-
-                        <p class="text-muted fw-medium">
-                            Active Users
-                        </p>
-
-                        <h3 class="text-success">
-                            {{ $activeUsers }}
-                        </h3>
-
-                    </div>
-
-                    <div class="avatar-sm rounded-circle bg-success align-self-center">
-
-                        <span class="avatar-title rounded-circle bg-success">
-
-                            <i class="bx bx-check-circle font-size-24"></i>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card mini-stats-wid">
-
-            <div class="card-body">
-
-                <div class="d-flex">
-
-                    <div class="flex-grow-1">
-
-                        <p class="text-muted fw-medium">
-                            Blocked Users
-                        </p>
-
-                        <h3 class="text-danger">
-                            {{ $blockedUsers }}
-                        </h3>
-
-                    </div>
-
-                    <div class="avatar-sm rounded-circle bg-danger align-self-center">
-
-                        <span class="avatar-title rounded-circle bg-danger">
-
-                            <i class="bx bx-block font-size-24"></i>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card mini-stats-wid">
-
-            <div class="card-body">
-
-                <div class="d-flex">
-
-                    <div class="flex-grow-1">
-
-                        <p class="text-muted fw-medium">
-                            Total Tasks
-                        </p>
-
-                        <h3>
-                            {{ $totalTasks }}
-                        </h3>
-
-                    </div>
-
-                    <div class="avatar-sm rounded-circle bg-info align-self-center">
-
-                        <span class="avatar-title rounded-circle bg-info">
-
-                            <i class="bx bx-task font-size-24"></i>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-{{-- Charts --}}
-
-<div class="row">
-
-    <div class="col-lg-6">
+    <div class="col-md-4">
 
         <div class="card">
-    <div class="card-header">
-        <h4 class="card-title">Task Status</h4>
-    </div>
-    <div class="card-body">
-        <div id="taskStatusChart" style="height:320px;"></div>
-    </div>
-</div>
+
+            <div class="card-body">
+
+                <div class="d-flex">
+
+                    <div class="flex-grow-1">
+
+                        <h5 class="text-muted">
+
+                            Total Schools
+
+                        </h5>
+
+                        <h2>
+
+                            {{ $totalSchools }}
+
+                        </h2>
+
+                    </div>
+
+                    <div>
+
+                        <i class="bx bx-buildings display-5 text-primary"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-md-4">
 
         <div class="card">
-    <div class="card-header">
-        <h4 class="card-title">Task Priority</h4>
+
+            <div class="card-body">
+
+                <div class="d-flex">
+
+                    <div class="flex-grow-1">
+
+                        <h5 class="text-muted">
+
+                            Active Schools
+
+                        </h5>
+
+                        <h2 class="text-success">
+
+                            {{ $activeSchools }}
+
+                        </h2>
+
+                    </div>
+
+                    <div>
+
+                        <i class="bx bx-check-circle display-5 text-success"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="card-body">
-        <div id="taskPriorityChart" style="height:320px;"></div>
-    </div>
-</div>
+
+    <div class="col-md-4">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="d-flex">
+
+                    <div class="flex-grow-1">
+
+                        <h5 class="text-muted">
+
+                            Blocked Schools
+
+                        </h5>
+
+                        <h2 class="text-danger">
+
+                            {{ $blockedSchools }}
+
+                        </h2>
+
+                    </div>
+
+                    <div>
+
+                        <i class="bx bx-block display-5 text-danger"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+
+
+
 <div class="row">
 
     <div class="col-lg-12">
 
         <div class="card">
 
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
 
                 <h4 class="card-title mb-0">
-                    Recent Users
+
+                    Recently Registered Schools
+
                 </h4>
+
+                <a href="{{ route('schools.index') }}"
+                   class="btn btn-primary btn-sm">
+
+                    View All
+
+                </a>
 
             </div>
 
@@ -234,57 +208,108 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle">
 
                         <thead>
 
-                            <tr>
+                        <tr>
 
-                                <th>Name</th>
+                            <th>#</th>
 
-                                <th>Email</th>
+                            <th>Name</th>
 
-                                <th>Status</th>
+                            <th>Email</th>
 
-                                <th>Joined</th>
+                            <th>Phone</th>
 
-                            </tr>
+                            <th>Status</th>
+
+                            <th>Created</th>
+
+                        </tr>
 
                         </thead>
 
                         <tbody>
 
-                            @foreach($recentUsers as $user)
+                        @forelse($recentSchools as $school)
 
-                            <tr>
+                        <tr>
 
-                                <td>{{ $user->name }}</td>
+                            <td>
 
-                                <td>{{ $user->email }}</td>
+                                {{ $loop->iteration }}
 
-                                <td>
+                            </td>
 
-                                    @if($user->status == 'blocked')
+                            <td>
 
-                                        {{ ucfirst($user->status) }}
+                                {{ $school->name }}
 
-                                    @else
+                            </td>
 
-                                        {{ ucfirst($user->status) }}
+                            <td>
 
-                                    @endif
+                                {{ $school->email }}
 
-                                </td>
+                            </td>
 
-                                <td>
+                            <td>
 
-                                    {{ $user->created_at->format('d M Y') }}
+                                {{ $school->phone }}
 
-                                </td>
+                            </td>
 
-                            </tr>
+                            <td>
 
-                            @endforeach
+                                @if($school->status)
+
+                                    <span class="badge bg-success">
+
+                                        Active
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-danger">
+
+                                        Blocked
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            <td>
+
+                                {{ $school->created_at->format('d M Y') }}
+
+                            </td>
+
+                        </tr>
+
+                        @empty
+
+                        <tr>
+
+                            <td colspan="6"
+                                class="text-center py-5">
+
+                                <i class="bx bx-buildings display-4 text-muted"></i>
+
+                                <h5 class="mt-3">
+
+                                    No Schools Registered
+
+                                </h5>
+
+                            </td>
+
+                        </tr>
+
+                        @endforelse
 
                         </tbody>
 
@@ -301,74 +326,3 @@
 </div>
 
 @endsection
-
-@push('scripts')
-
-<script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const statusEl = document.querySelector("#taskStatusChart");
-    const priorityEl = document.querySelector("#taskPriorityChart");
-
-    statusEl.innerHTML = "";
-    priorityEl.innerHTML = "";
-
-    if (window.statusChart) {
-        window.statusChart.destroy();
-    }
-
-    if (window.priorityChart) {
-        window.priorityChart.destroy();
-    }
-
-    window.statusChart = new ApexCharts(statusEl, {
-        chart: {
-            type: "bar",
-            height: 320,
-            toolbar: { show: false }
-        },
-        colors: ["#556ee6"],
-        series: [{
-            name: "Tasks",
-            data: [{{ $completedTasks }}, {{ $pendingTasks }}]
-        }],
-        xaxis: {
-            categories: ["Completed", "Pending"]
-        },
-        dataLabels: {
-            enabled: true
-        }
-    });
-
-    window.statusChart.render();
-
-    window.priorityChart = new ApexCharts(priorityEl, {
-        chart: {
-            type: "pie",
-            height: 320
-        },
-        labels: ["High", "Medium", "Low"],
-        series: [
-            {{ $highPriority }},
-            {{ $mediumPriority }},
-            {{ $lowPriority }}
-        ],
-        colors: [
-            "#f46a6a",
-            "#f1b44c",
-            "#34c38f"
-        ],
-        legend: {
-            position: "bottom"
-        }
-    });
-
-    window.priorityChart.render();
-});
-
-</script>
-
-@endpush

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class AdminMiddleware
+class SchoolMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
@@ -15,7 +15,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'school') {
             abort(403, 'Unauthorized');
         }
 

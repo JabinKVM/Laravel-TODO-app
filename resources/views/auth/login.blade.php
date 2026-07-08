@@ -323,40 +323,7 @@
     </div>
 
 </div>
-<!-- Register -->
 
-<div class="mt-5 text-center">
-
-    <p>
-
-        Don't have an account?
-
-        <a href="{{ route('register') }}"
-           class="fw-medium text-primary">
-
-            Create Account
-
-        </a>
-
-    </p>
-
-    <p class="text-muted">
-
-        © {{ date('Y') }}
-
-        TodoPro
-
-        <br>
-
-        <small>
-
-            Built with Laravel 12 
-
-        </small>
-
-    </p>
-
-</div>
 
 </div>
 
