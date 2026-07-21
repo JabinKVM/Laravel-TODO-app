@@ -1,236 +1,149 @@
 @extends('layouts.master')
 
-@section('title','User Profile')
+@section('title', 'School Details')
 
 @section('content')
 
-<div class="row">
+<div class="page-content">
 
-<div class="col-12">
+    <div class="container-fluid">
 
-<div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <div class="row">
 
-<h4 class="mb-sm-0">
+            <div class="col-12">
 
-User Profile
+                <div class="page-title-box d-flex align-items-center justify-content-between">
 
-</h4>
+                    <h4 class="mb-0">
+                        School Details
+                    </h4>
 
-<div class="page-title-right">
+                    <a href="{{ route('admin.schools.index') }}"
+                       class="btn btn-secondary">
+                        Back
+                    </a>
 
-<ol class="breadcrumb m-0">
+                </div>
 
-<li class="breadcrumb-item">
+            </div>
 
-<a href="{{ route('admin.dashboard') }}">
+        </div>
 
-Admin
+        <div class="card">
 
-</a>
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    School Information
+                </h4>
+            </div>
 
-</li>
+            <div class="card-body">
 
-<li class="breadcrumb-item">
+               <table id="datatable"
+       class="table table-bordered dt-responsive nowrap w-100"></table>
 
-<a href="{{ route('admin.users') }}">
+                    <tr>
+                        <th width="250">School Name</th>
+                        <td>{{ $school->name }}</td>
+                    </tr>
 
-Users
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ $school->email }}</td>
+                    </tr>
 
-</a>
+                    <tr>
+                        <th>Phone</th>
+                        <td>{{ $school->phone }}</td>
+                    </tr>
 
-</li>
+                    <tr>
+                        <th>Address</th>
+                        <td>{{ $school->address }}</td>
+                    </tr>
 
-<li class="breadcrumb-item active">
+                    <tr>
+                        <th>Status</th>
 
-{{ $user->name }}
+                        <td>
 
-</li>
+                            @if($school->status)
 
-</ol>
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
 
-</div>
+                            @else
 
-</div>
+                                <span class="badge bg-danger">
+                                    Blocked
+                                </span>
 
-</div>
+                            @endif
 
-</div>
+                        </td>
 
-<div class="row">
+                    </tr>
 
-<div class="col-xl-4">
+                </table>
 
-<div class="card">
+            </div>
 
-<div class="card-body text-center">
-    @if($user->profile_photo)
+        </div>
 
-<img
-src="{{ asset('storage/'.$user->profile_photo) }}"
-class="rounded-circle img-thumbnail"
-style="width:150px;height:150px;object-fit:cover;">
+        <div class="row mt-3">
 
-@else
+            <div class="col-md-4">
 
-<img
-src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
-class="rounded-circle img-thumbnail"
-style="width:150px;height:150px;object-fit:cover;">
+                <div class="card">
 
-@endif
+                    <div class="card-body text-center">
 
-<h4 class="mt-4">
+                        <h6>Total Students</h6>
 
-{{ $user->name }}
+                        <h2>{{ $totalStudents }}</h2>
 
-</h4>
+                    </div>
 
-<p class="text-muted">
+                </div>
 
-{{ $user->email }}
+            </div>
 
-</p>
+            <div class="col-md-4">
 
-<hr>
+                <div class="card">
 
-<div class="text-start">
+                    <div class="card-body text-center">
 
-<p>
+                        <h6>Pending Tasks</h6>
 
-<strong>Role :</strong>
+                        <h2>{{ $pendingTasks }}</h2>
 
-{{ ucfirst($user->role) }}
+                    </div>
 
-</p>
+                </div>
 
-<p>
+            </div>
 
-<strong>Status :</strong>
+            <div class="col-md-4">
 
-{{ ucfirst($user->status) }}
+                <div class="card">
 
-</p>
+                    <div class="card-body text-center">
 
-<p>
+                        <h6>Completed Tasks</h6>
 
-<strong>Joined :</strong>
+                        <h2>{{ $completedTasks }}</h2>
 
-{{ $user->created_at->format('d M Y') }}
+                    </div>
 
-</p>
+                </div>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
-
-</div>
-<div class="col-xl-8">
-
-<div class="card">
-
-<div class="card-header">
-
-<h4>
-
-Task Statistics
-
-</h4>
-
-</div>
-
-<div class="card-body">
-
-<div class="row">
-
-<div class="col-md-3">
-
-<div class="card border">
-
-<div class="card-body text-center">
-
-<h2>
-
-{{ $totalTasks }}
-
-</h2>
-
-<p>Total</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card border">
-
-<div class="card-body text-center">
-
-<h2>
-
-{{ $completedTasks }}
-
-</h2>
-
-<p>Completed</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card border">
-
-<div class="card-body text-center">
-
-<h2>
-
-{{ $pendingTasks }}
-
-</h2>
-
-<p>Pending</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card border">
-
-<div class="card-body text-center">
-
-<h2>
-
-{{ $highPriorityTasks }}
-
-</h2>
-
-<p>High Priority</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 

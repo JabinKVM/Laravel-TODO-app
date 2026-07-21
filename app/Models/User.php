@@ -99,4 +99,19 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+
+    public function schoolConversations()
+{
+    return $this->hasMany(Conversation::class, 'school_user_id');
+}
+
+public function studentConversations()
+{
+    return $this->hasMany(Conversation::class, 'student_user_id');
+}
+
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
 }

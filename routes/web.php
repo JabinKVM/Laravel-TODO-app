@@ -5,167 +5,289 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Taskcontroller;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessaController;
+/*
+|--------------------------------------------------------------------------
+| Home
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
+
     return redirect()->route('login');
+
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard Redirect
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/dashboard', function () {
+
+        return match(auth()->user()->role){
+
+            'admin'   => redirect()->route('admin.dashboard'),
+
+            'school'  => redirect()->route('school.dashboard'),
+
+            'student' => redirect()->route('student.dashboard'),
+
+            default   => abort(403),
+
+        };
+
+    })->name('dashboard');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Profile
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
+
+    Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
+
+    Route::delete('/profile',[ProfileController::class,'destroy'])->name('profile.destroy');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])
+->prefix('admin')
+->name('admin.')
+->group(function () {
+
+    Route::get('/dashboard',[AdminController::class,'dashboard'])
+        ->name('dashboard');
+
+
+
     /*
     |--------------------------------------------------------------------------
-    | ADMIN
+    | School Management
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware('role:admin')
-        ->prefix('admin')
-        ->group(function () {
+    Route::get('/schools',[AdminController::class,'schools'])
+        ->name('schools.index');
 
-            Route::get('/dashboard', [AdminController::class,'dashboard'])
-                ->name('admin.dashboard');
+    Route::get('/schools/create',[AdminController::class,'createSchool'])
+        ->name('schools.create');
 
-            Route::get('/schools', [AdminController::class,'schools'])
-                ->name('schools.index');
+    Route::post('/schools',[AdminController::class,'storeSchool'])
+        ->name('schools.store');
 
-            Route::get('/schools/create', [AdminController::class,'createSchool'])
-                ->name('schools.create');
+    Route::get('/schools/{id}',[AdminController::class,'schoolDetails'])
+        ->name('schools.show');
 
-            Route::post('/schools', [AdminController::class,'storeSchool'])
-                ->name('schools.store');
+    Route::get('/schools/{id}/edit',[AdminController::class,'editSchool'])
+        ->name('schools.edit');
 
-            Route::get('/schools/{school}', [AdminController::class,'showSchool'])
-                ->name('schools.show');
+    Route::put('/schools/{id}',[AdminController::class,'updateSchool'])
+        ->name('schools.update');
 
-            Route::get('/schools/{school}/edit', [AdminController::class,'editSchool'])
-                ->name('schools.edit');
+    Route::patch('/schools/{id}/block',[AdminController::class,'blockSchool'])
+        ->name('schools.block');
 
-            Route::put('/schools/{school}', [AdminController::class,'updateSchool'])
-                ->name('schools.update');
+    Route::patch('/schools/{id}/unblock',[AdminController::class,'unblockSchool'])
+        ->name('schools.unblock');
 
-            Route::delete('/schools/{school}', [AdminController::class,'destroySchool'])
-                ->name('schools.destroy');
+    Route::delete('/schools/{id}',[AdminController::class,'deleteSchool'])
+        ->name('schools.delete');
 
-            Route::patch('/schools/{school}/status', [AdminController::class,'toggleSchoolStatus'])
-                ->name('schools.status');
+});
 
-        });
 
-    /*
-    |--------------------------------------------------------------------------
-    | SCHOOL
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| School Routes
+|--------------------------------------------------------------------------
+*/
 
-    Route::middleware('role:school')
-        ->prefix('school')
-        ->group(function () {
+Route::middleware(['auth'])
+    ->prefix('school')
+    ->name('school.')
+    ->group(function () {
 
-            Route::get('/dashboard', [SchoolController::class,'dashboard'])
-                ->name('school.dashboard');
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
 
-            /*
-            |--------------------------------------------------------------------------
-            | STUDENTS
-            |--------------------------------------------------------------------------
-            */
+        Route::get('/dashboard', [SchoolController::class, 'dashboard'])
+            ->name('dashboard');
 
-            Route::get('/students', [SchoolController::class,'students'])
-                ->name('school.students');
+        /*
+        |--------------------------------------------------------------------------
+        | Student Management
+        |--------------------------------------------------------------------------
+        */
 
-            Route::get('/students/create', [SchoolController::class,'createStudent'])
-                ->name('school.students.create');
+        Route::get('/students', [SchoolController::class, 'students'])
+            ->name('students.index');
 
-            Route::post('/students', [SchoolController::class,'storeStudent'])
-                ->name('school.students.store');
+        Route::get('/students/create', [SchoolController::class, 'createStudent'])
+            ->name('students.create');
 
-            Route::get('/students/{student}', [SchoolController::class,'showStudent'])
-                ->name('school.students.show');
+        Route::post('/students', [SchoolController::class, 'storeStudent'])
+            ->name('students.store');
 
-            Route::get('/students/{student}/edit', [SchoolController::class,'editStudent'])
-                ->name('school.students.edit');
+        Route::get('/students/{id}', [SchoolController::class, 'studentDetails'])
+            ->name('students.show');
 
-            Route::put('/students/{student}', [SchoolController::class,'updateStudent'])
-                ->name('school.students.update');
+        Route::get('/students/{id}/edit', [SchoolController::class, 'editStudent'])
+            ->name('students.edit');
 
-            Route::delete('/students/{student}', [SchoolController::class,'destroyStudent'])
-                ->name('school.students.destroy');
+        Route::put('/students/{id}', [SchoolController::class, 'updateStudent'])
+            ->name('students.update');
 
-            Route::patch('/students/{student}/status', [SchoolController::class,'toggleStudentStatus'])
-                ->name('school.students.status');
+        Route::patch('/students/{id}/block', [SchoolController::class, 'blockStudent'])
+            ->name('students.block');
 
-            /*
-            |--------------------------------------------------------------------------
-            | TASKS
-            |--------------------------------------------------------------------------
-            */
+        Route::patch('/students/{id}/unblock', [SchoolController::class, 'unblockStudent'])
+            ->name('students.unblock');
 
-            Route::get('/tasks', [TaskController::class,'index'])
-                ->name('school.tasks.index');
+        Route::delete('/students/{id}', [SchoolController::class, 'deleteStudent'])
+            ->name('students.delete');
 
-            Route::get('/tasks/create', [TaskController::class,'create'])
-                ->name('school.tasks.create');
 
-            Route::post('/tasks', [TaskController::class,'store'])
-                ->name('school.tasks.store');
 
-            Route::get('/tasks/{id}/edit', [TaskController::class,'edit'])
-                ->name('school.tasks.edit');
 
-            Route::put('/tasks/{id}', [TaskController::class,'update'])
-                ->name('school.tasks.update');
+        Route::prefix('tasks')->name('tasks.')->group(function () {
 
-            Route::delete('/tasks/{id}', [TaskController::class,'destroy'])
-                ->name('school.tasks.destroy');
+    Route::get('/', [TaskController::class, 'index'])->name('index');
 
-        });
+    Route::get('/create', [TaskController::class, 'create'])->name('create');
 
-   /*
+    Route::post('/', [TaskController::class, 'store'])->name('store');
+
+    Route::get('/{id}', [TaskController::class, 'show'])->name('show');
+
+    Route::get('/{id}/edit', [TaskController::class, 'edit'])->name('edit');
+
+    Route::put('/{id}', [TaskController::class, 'update'])->name('update');
+
+    Route::delete('/{id}', [TaskController::class, 'destroy'])->name('destroy');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Chat
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('chat')->name('chat.')->group(function () {
+
+    Route::get('/', [ChatController::class, 'schoolIndex'])
+        ->name('index');
+
+    Route::get('/{id}', [ChatController::class, 'open'])
+        ->name('open');
+
+    Route::post('/send/{conversation}', [ChatController::class, 'send'])
+        ->name('send');
+
+});
+
+    });
+
+
+/*
 |--------------------------------------------------------------------------
 | STUDENT
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('role:student')
-    ->prefix('student')
-    ->group(function () {
+Route::middleware(['auth'])
+->prefix('student')
+->name('student.')
+->group(function(){
 
-        Route::get('/dashboard', [StudentController::class,'dashboard'])
-            ->name('student.dashboard');
+    Route::get('/dashboard',[StudentController::class,'dashboard'])
+        ->name('dashboard');
+    Route::get('/students', [SchoolController::class, 'students'])
+    ->name('students.index');
 
-        Route::get('/tasks', [TaskController::class,'myTasks'])
-            ->name('student.tasks');
+Route::get('/students/{id}', [SchoolController::class, 'studentDetails'])
+    ->name('students.show');
 
-        // View Single Task
-        Route::get('/tasks/{id}', [TaskController::class,'show'])
-            ->name('student.tasks.show');
+Route::get('/students/{id}/edit', [SchoolController::class, 'editStudent'])
+    ->name('students.edit');
 
-        // Mark Completed
-        Route::patch('/tasks/{id}/complete', [TaskController::class,'complete'])
-            ->name('student.tasks.complete');
+Route::put('/students/{id}', [SchoolController::class, 'updateStudent'])
+    ->name('students.update');
 
-        // Mark Pending Again
-        Route::patch('/tasks/{id}/pending', [TaskController::class,'pending'])
-            ->name('student.tasks.pending');
+Route::patch('/students/{id}/block', [SchoolController::class, 'blockStudent'])
+    ->name('students.block');
 
-    });
-    /*
-    |--------------------------------------------------------------------------
-    | PROFILE
-    |--------------------------------------------------------------------------
-    */
+Route::patch('/students/{id}/unblock', [SchoolController::class, 'unblockStudent'])
+    ->name('students.unblock');
 
-    Route::get('/profile', [ProfileController::class,'edit'])
-        ->name('profile.edit');
+Route::delete('/students/{id}', [SchoolController::class, 'deleteStudent'])
+    ->name('students.delete');
 
-    Route::patch('/profile', [ProfileController::class,'update'])
-        ->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class,'destroy'])
-        ->name('profile.destroy');
+Route::prefix('tasks')->name('tasks.')->group(function () {
+
+    Route::get('/', [TaskController::class, 'myTasks'])->name('index');
+
+    Route::get('/pending', [TaskController::class, 'pendingTasks'])->name('pending');
+
+    Route::get('/completed', [TaskController::class, 'completedTasks'])->name('completed');
+
+    Route::get('/high-priority', [TaskController::class, 'highPriorityTasks'])->name('high');
+
+    Route::get('/{id}', [TaskController::class, 'studentShow'])->name('show');
+
+    Route::patch('/{id}/complete', [TaskController::class, 'complete'])->name('complete');
+
+    Route::patch('/{id}/pending', [TaskController::class, 'pending'])->name('markPending');
 
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Chat
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('chat')->name('chat.')->group(function () {
+
+    Route::get('/', [ChatController::class, 'studentIndex'])
+        ->name('index');
+
+    Route::get('/{id}', [ChatController::class, 'open'])
+        ->name('open');
+
+    Route::post('/send/{conversation}', [ChatController::class, 'send'])
+        ->name('send');
+
+});
+});
+
 
 require __DIR__.'/auth.php';

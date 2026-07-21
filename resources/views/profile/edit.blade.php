@@ -1,36 +1,20 @@
 @extends('layouts.master')
 
-@section('title', 'My Profile')
+@section('title','My Profile')
 
 @section('content')
-
-<!-- Page Title -->
 
 <div class="row">
 
     <div class="col-12">
 
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
 
-            <h4 class="mb-sm-0 font-size-18">
+            <h4 class="mb-0">
 
                 My Profile
 
             </h4>
-
-            <div class="page-title-right">
-
-                <ol class="breadcrumb m-0">
-
-                    <li class="breadcrumb-item">
-                    <a href="{{ route('dashboard') }}">Dashboard</a>
-                    </li>
-
-                    
-
-                </ol>
-
-            </div>
 
         </div>
 
@@ -38,47 +22,271 @@
 
 </div>
 
-            <!-- End Page Title -->
+@if(session('success'))
+
+<div class="alert alert-success">
+
+    {{ session('success') }}
+
+</div>
+
+@endif
+
+@if($errors->any())
+
+<div class="alert alert-danger">
+
+    <ul class="mb-0">
+
+        @foreach($errors->all() as $error)
+
+            <li>{{ $error }}</li>
+
+        @endforeach
+
+    </ul>
+
+</div>
+
+@endif
 
 
+<div class="card overflow-hidden shadow-sm">
 
-            <div class="row">
+    <!-- Cover -->
 
-                <!-- Left Profile Card -->
+    <div class="bg-primary bg-soft">
 
-                <div class="col-xl-4">
+        <div style="height:170px;"></div>
 
-                    <div class="card overflow-hidden">
+    </div>
 
-                        <div class="bg-primary bg-soft">
+    <div class="card-body">
+
+        <div class="row">
+
+            <!-- LEFT PANEL -->
+
+            <div class="col-xl-3 col-lg-4">
+
+                <div class="text-center">
+
+                    <div class="position-relative d-inline-block">
+
+                        <img
+
+                            id="preview-image"
+
+                            src="{{ Auth::user()->profile_photo
+                                ? asset('storage/'.Auth::user()->profile_photo)
+                                : asset('assets/images/users/avatar-1.jpg') }}"
+
+                            class="rounded-circle img-thumbnail"
+
+                            style="width:170px;
+                                   height:170px;
+                                   object-fit:cover;
+                                   margin-top:-100px;">
+
+                        <label
+
+                            for="profile_photo"
+
+                            class="btn btn-primary btn-sm rounded-circle"
+
+                            style="position:absolute;
+                                   bottom:10px;
+                                   right:10px;">
+
+                            <i class="bx bx-camera"></i>
+
+                        </label>
+
+                    </div>
+
+                    <h3 class="mt-3">
+
+                        {{ Auth::user()->name }}
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        {{ ucfirst(Auth::user()->role) }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+
+            <div class="col-xl-9 col-lg-8">
+
+                <div class="card border">
+
+                    <div class="card-header">
+
+                        <h5 class="mb-0">
+
+                            Personal Information
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <form
+                            action="{{ route('profile.update') }}"
+                            method="POST">
+
+                            @csrf
+
+                            @method('PATCH')
 
                             <div class="row">
 
-                                <div class="col-7">
+                                <div class="col-md-6 mb-3">
 
-                                    <div class="text-primary p-3">
+                                    <label class="form-label">
 
-                                        <h5 class="text-primary">
+                                        Name
 
-                                            Welcome Back!
+                                    </label>
 
-                                        </h5>
-
-                                        <p>
-
-                                            TodoPro Profile
-
-                                        </p>
-
-                                    </div>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        class="form-control"
+                                        value="{{ old('name',$user->name) }}">
 
                                 </div>
 
-                                <div class="col-5 align-self-end">
+                                <div class="col-md-6 mb-3">
 
-                                    <img src="{{ asset('assets/images/profile-img.png') }}"
+                                    <label class="form-label">
 
-                                         class="img-fluid">
+                                        Email
+
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        class="form-control"
+                                        value="{{ old('email',$user->email) }}">
+
+                                </div>
+                                                            </div>
+
+                            <div class="mt-2">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-success">
+
+                                    <i class="bx bx-save"></i>
+
+                                    Save Changes
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- Upload Profile Picture -->
+
+                <div class="card border mt-4">
+
+                    <div class="card-header">
+
+                        <h5 class="mb-0">
+
+                            Profile Picture
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <form
+                            action="{{ route('profile.photo') }}"
+                            method="POST"
+                            enctype="multipart/form-data">
+
+                            @csrf
+
+                            <input
+                                type="file"
+                                id="profile_photo"
+                                name="profile_photo"
+                                class="d-none"
+                                onchange="previewImage(event)">
+
+                            <p class="text-muted mb-3">
+
+                                Click the camera icon on your profile picture to
+                                choose a new image.
+
+                            </p>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+
+                                <i class="bx bx-upload"></i>
+
+                                Upload New Picture
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- Statistics -->
+
+                <div class="row mt-4">
+
+                    <div class="col-md-3">
+
+                        <div class="card mini-stats-wid shadow-sm">
+
+                            <div class="card-body">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <div>
+
+                                        <p class="text-muted">
+
+                                            Total Tasks
+
+                                        </p>
+
+                                        <h3>
+
+                                            {{ $totaltasks }}
+
+                                        </h3>
+
+                                    </div>
+
+                                    <div>
+
+                                        <i class="bx bx-task display-6 text-primary"></i>
+
+                                    </div>
 
                                 </div>
 
@@ -86,253 +294,395 @@
 
                         </div>
 
+                    </div>
 
+                    <div class="col-md-3">
 
-                        <div class="card-body pt-0">
+                        <div class="card mini-stats-wid shadow-sm">
 
-                            <div class="text-center">
+                            <div class="card-body">
 
-                                <div class="text-center mt-4">
+                                <div class="d-flex justify-content-between">
 
-    @if($user->profile_photo)
+                                    <div>
 
-        <img
-            src="{{ asset('storage/'.$user->profile_photo) }}"
-            alt="Profile Photo"
-            class="rounded-circle avatar-xl img-thumbnail"
-            style="width:140px;height:140px;object-fit:cover;">
+                                        <p class="text-muted">
 
-    @else
+                                            Completed
 
-        <img
-            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=300&background=556ee6&color=fff"
-            alt="Profile Photo"
-            class="rounded-circle avatar-xl img-thumbnail"
-            style="width:140px;height:140px;object-fit:cover;">
+                                        </p>
 
-    @endif
+                                        <h3 class="text-success">
 
-       </div>
+                                            {{ $completedTasks }}
 
-            <div class="text-center mt-3">
+                                        </h3>
 
-                <h4 class="mb-1">{{ $user->name }}</h4>
+                                    </div>
 
-                <p class="text-muted mb-0">{{ $user->email }}</p>
+                                    <div>
 
-            </div>
+                                        <i class="bx bx-check-circle display-6 text-success"></i>
 
-                                
+                                    </div>
 
-         </div>
+                                </div>
 
-                           
-                            <!-- User Statistics -->
-
-<div class="table-responsive">
-
-    <table class="table table-borderless mb-0">
-
-        <tbody>
-
-            <tr>
-
-                <th scope="row">
-
-                    Member Since
-
-                </th>
-
-                <td>
-
-                    {{ $user->created_at->format('d M Y') }}
-
-                </td>
-
-            </tr>
-
-            
-
-           
-
-            
-
-                
-
-        </tbody>
-
-    </table>
-
-</div>
-
-<hr>
-
-
-</div>
-
-</div>
-
-</div>
-
-<!-- Right Side -->
-
-<div class="col-xl-8">
-
-    <div class="card">
-
-        <div class="card-header">
-
-            <h4 class="card-title">
-
-                <i class="bx bx-user me-2"></i>
-
-                Profile Information
-
-            </h4>
-
-        </div>
-
-        <div class="card-body">
-
-            <form method="POST"
-
-                  action="{{ route('profile.update') }}"
-
-                  enctype="multipart/form-data">
-
-                @csrf
-
-                @method('PATCH')
-
-                <div class="row">
-
-                    <!-- Name -->
-
-                    <div class="col-md-6">
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-
-                                Full Name
-
-                            </label>
-
-                            <input
-
-                                type="text"
-
-                                class="form-control"
-
-                                name="name"
-
-                                value="{{ old('name',$user->name) }}"
-
-                                required>
+                            </div>
 
                         </div>
 
                     </div>
 
-                    <!-- Email -->
+                    <div class="col-md-3">
 
-                    <div class="col-md-6">
-    <div class="mb-3">
+                        <div class="card mini-stats-wid shadow-sm">
 
-        <label class="form-label">
-            Email Address
-        </label>
+                            <div class="card-body">
 
-        <input
-            type="email"
-            class="form-control"
-            name="email"
-            value="{{ old('email', $user->email) }}"
-            required>
+                                <div class="d-flex justify-content-between">
 
-        @error('email')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
+                                    <div>
 
-    </div>
-</div>
+                                        <p class="text-muted">
 
-                    
-                                        <!-- Profile Photo -->
+                                            Pending
 
-                    <div class="col-md-12">
+                                        </p>
 
-                        <div class="mb-3">
+                                        <h3 class="text-warning">
 
-                            <label class="form-label">
+                                            {{ $pendingTasks }}
 
-                                Profile Photo
+                                        </h3>
 
-                            </label>
+                                    </div>
 
-                            <input
-                                id="profile_photo"
-                                type="file"
-                                name="profile_photo"
-                                class="form-control"
-                                accept="image/*">
+                                    <div>
+
+                                        <i class="bx bx-time-five display-6 text-warning"></i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                    <!-- Save Button -->
+                    <div class="col-md-3">
 
-                    <div class="col-md-12">
+                        <div class="card mini-stats-wid shadow-sm">
 
-                        <button
-                            type="submit"
-                            class="btn btn-primary">
+                            <div class="card-body">
 
-                            <i class="bx bx-save me-1"></i>
+                                <div class="d-flex justify-content-between">
 
-                            Save Changes
+                                    <div>
 
-                        </button>
+                                        <p class="text-muted">
+
+                                            High Priority
+
+                                        </p>
+
+                                        <h3 class="text-danger">
+
+                                            {{ $highPriorityTasks }}
+
+                                        </h3>
+
+                                    </div>
+
+                                    <div>
+
+                                        <i class="bx bx-error-circle display-6 text-danger"></i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </form>
+            </div>
 
         </div>
 
     </div>
 
+</div>
+<!-- Account Information -->
 
+<div class="card mt-4">
 
-    <!-- Change Password -->
+    <div class="card-header bg-light">
 
-    <div class="card">
+        <h5 class="mb-0">
 
-        <div class="card-header">
+            Account Information
 
-            <h4 class="card-title">
+        </h5>
 
-                <i class="bx bx-lock me-2"></i>
+    </div>
 
-                Change Password
+    <div class="card-body">
 
-            </h4>
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Role
+
+                </label>
+
+                <h6>
+
+                    {{ ucfirst($user->role) }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Member Since
+
+                </label>
+
+                <h6>
+
+                    {{ $user->created_at->format('d M Y') }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Account Status
+
+                </label>
+
+                <br>
+
+                <span class="badge bg-success">
+
+                    Active
+
+                </span>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Last Updated
+
+                </label>
+
+                <h6>
+
+                    {{ $user->updated_at->format('d M Y') }}
+
+                </h6>
+
+            </div>
 
         </div>
 
-        <div class="card-body">
+        <hr>
 
-            <form method="POST"
-                  action="{{ route('password.update') }}">
+        @if($user->role=='school' && $school)
 
-                @csrf
+        <div class="row">
 
-                @method('PUT')
+            <div class="col-md-4">
 
-                <div class="mb-3">
+                <label class="text-muted">
+
+                    School Name
+
+                </label>
+
+                <h6>
+
+                    {{ $school->name }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <label class="text-muted">
+
+                    Phone
+
+                </label>
+
+                <h6>
+
+                    {{ $school->phone }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <label class="text-muted">
+
+                    Address
+
+                </label>
+
+                <h6>
+
+                    {{ $school->address }}
+
+                </h6>
+
+            </div>
+
+        </div>
+
+        @endif
+
+
+        @if($user->role=='student' && $student)
+
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Student ID
+
+                </label>
+
+                <h6>
+
+                    {{ $student->student_id }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Class
+
+                </label>
+
+                <h6>
+
+                    {{ $student->class }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Phone
+
+                </label>
+
+                <h6>
+
+                    {{ $student->phone }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="text-muted">
+
+                    Status
+
+                </label>
+
+                <br>
+
+                @if($student->status)
+
+                    <span class="badge bg-success">
+
+                        Active
+
+                    </span>
+
+                @else
+
+                    <span class="badge bg-danger">
+
+                        Inactive
+
+                    </span>
+
+                @endif
+
+            </div>
+
+        </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+
+
+<!-- Change Password -->
+
+<div class="card mt-4">
+
+    <div class="card-header bg-light">
+
+        <h5 class="mb-0">
+
+            Change Password
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <form
+            action="{{ route('profile.password') }}"
+            method="POST">
+
+            @csrf
+
+            @method('PATCH')
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
 
                     <label class="form-label">
 
@@ -343,11 +693,12 @@
                     <input
                         type="password"
                         name="current_password"
-                        class="form-control">
+                        class="form-control"
+                        required>
 
                 </div>
 
-                <div class="mb-3">
+                <div class="col-md-4 mb-3">
 
                     <label class="form-label">
 
@@ -358,11 +709,12 @@
                     <input
                         type="password"
                         name="password"
-                        class="form-control">
+                        class="form-control"
+                        required>
 
                 </div>
 
-                <div class="mb-3">
+                <div class="col-md-4 mb-3">
 
                     <label class="form-label">
 
@@ -373,175 +725,60 @@
                     <input
                         type="password"
                         name="password_confirmation"
-                        class="form-control">
+                        class="form-control"
+                        required>
 
                 </div>
 
-                <button
-                    class="btn btn-success">
-
-                    <i class="bx bx-check-circle me-1"></i>
-
-                    Update Password
-
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- Danger Zone -->
-
-    <div class="card border border-danger">
-
-        <div class="card-header bg-danger text-white">
-
-            <h4 class="card-title text-white mb-0">
-
-                <i class="bx bx-trash me-2"></i>
-
-                Danger Zone
-
-            </h4>
-
-        </div>
-
-        <div class="card-body">
-
-            <p class="text-muted">
-
-                Permanently delete your TodoPro account.
-
-                This action cannot be undone.
-
-            </p>
+            </div>
 
             <button
-    type="button"
-    class="btn btn-danger waves-effect waves-light"
-    data-bs-toggle="modal"
-    data-bs-target="#deleteAccountModal">
+                type="submit"
+                class="btn btn-warning">
 
-    <i class="bx bx-trash me-1"></i>
+                <i class="bx bx-lock-alt"></i>
 
-    Delete Account
+                Change Password
 
-</button>
+            </button>
 
-        </div>
+        </form>
 
     </div>
 
 </div>
-<!-- Delete Account Modal -->
+@push('scripts')
 
-<div class="modal fade"
-     id="deleteAccountModal"
-     tabindex="-1"
-     aria-hidden="true">
+<script>
 
-    <div class="modal-dialog modal-dialog-centered">
+function previewImage(event)
+{
+    const preview = document.getElementById('preview-image');
 
-        <div class="modal-content">
+    preview.src = URL.createObjectURL(event.target.files[0]);
+}
 
-            <div class="modal-header bg-danger text-white">
+document.addEventListener("DOMContentLoaded", function () {
 
-                <h5 class="modal-title">
+    const avatar = document.getElementById("preview-image");
+    const fileInput = document.getElementById("profile_photo");
 
-                    <i class="bx bx-error-circle me-2"></i>
+    if (avatar && fileInput) {
 
-                    Delete Account
+        avatar.style.cursor = "pointer";
 
-                </h5>
+        avatar.addEventListener("click", function () {
 
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal">
-                </button>
+            fileInput.click();
 
-            </div>
+        });
 
-            <div class="modal-body text-center">
+    }
 
-                <i class="bx bx-trash text-danger"
-                   style="font-size:60px;"></i>
+});
 
-                <h4 class="mt-3">
-                    Are you sure?
-                </h4>
+</script>
 
-                <p class="text-muted">
+@endpush
 
-                    This will permanently delete your account.
-
-                    <br>
-
-                    All your tasks and profile information will be removed permanently.
-
-                    <br><br>
-
-                    <strong>This action cannot be undone.</strong>
-
-                </p>
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="btn btn-light"
-                    data-bs-dismiss="modal">
-
-                    Cancel
-
-                </button>
-
-                <form method="POST"
-      action="{{ route('profile.destroy') }}">
-
-    @csrf
-    @method('DELETE')
-
-    <div class="mb-3">
-
-        <label class="form-label">
-
-            Confirm Password
-
-        </label>
-
-        <input
-            type="password"
-            name="password"
-            class="form-control"
-            placeholder="Enter your password"
-            required>
-
-    </div>
-
-    <button
-        type="submit"
-        class="btn btn-danger">
-
-        <i class="bx bx-trash me-1"></i>
-
-        Continue Delete
-
-    </button>
-
-</form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 @endsection

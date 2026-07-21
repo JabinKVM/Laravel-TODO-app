@@ -10,29 +10,17 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-
-        'user_id',
-
-        'created_by',
-
+        'school_id',
+        'student_id',
         'title',
-
         'description',
-
         'priority',
-
         'due_date',
-
-        'completed',
-
+        'status',
     ];
 
     protected $casts = [
-
-        'completed' => 'boolean',
-
         'due_date' => 'date',
-
     ];
 
     /*
@@ -41,13 +29,13 @@ class Task extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function user()
+    public function school()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(School::class);
     }
 
-    public function creator()
+    public function student()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Student::class);
     }
 }

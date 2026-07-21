@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'School Dashboard')
 
 @section('content')
 
@@ -17,14 +17,8 @@
                 <div class="page-title-box d-flex align-items-center justify-content-between">
 
                     <h4 class="mb-0">
-                        Admin Dashboard
+                        School Dashboard
                     </h4>
-
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item active">
-                            Dashboard
-                        </li>
-                    </ol>
 
                 </div>
 
@@ -50,15 +44,15 @@
 
                     <div class="card-body text-center">
 
-                        <h6 class="text-muted mb-3">
+                        <h6 class="text-muted">
 
-                            Total Schools
+                            Total Students
 
                         </h6>
 
                         <h2>
 
-                            {{ $totalSchools }}
+                            {{ $totalStudents }}
 
                         </h2>
 
@@ -74,15 +68,15 @@
 
                     <div class="card-body text-center">
 
-                        <h6 class="text-muted mb-3">
+                        <h6 class="text-muted">
 
-                            Active Schools
+                            Active Students
 
                         </h6>
 
                         <h2>
 
-                            {{ $activeSchools }}
+                            {{ $activeStudents }}
 
                         </h2>
 
@@ -98,15 +92,15 @@
 
                     <div class="card-body text-center">
 
-                        <h6 class="text-muted mb-3">
+                        <h6 class="text-muted">
 
-                            Blocked Schools
+                            Blocked Students
 
                         </h6>
 
                         <h2>
 
-                            {{ $blockedSchools }}
+                            {{ $blockedStudents }}
 
                         </h2>
 
@@ -122,7 +116,7 @@
 
             <div class="card-header">
 
-                <h5 class="mb-0">
+                <h5>
 
                     Quick Actions
 
@@ -132,23 +126,17 @@
 
             <div class="card-body">
 
-                <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('school.students.create') }}"
+   class="btn btn-primary">
+    Register Student
+</a>
 
-                    <a href="{{ route('admin.schools.create') }}"
-                       class="btn btn-primary">
+                <a href="{{ route('school.students.index') }}"
+                   class="btn btn-secondary">
 
-                        Register School
+                    View Students
 
-                    </a>
-
-                    <a href="{{ route('admin.schools.index') }}"
-                       class="btn btn-secondary">
-
-                        View Schools
-
-                    </a>
-
-                </div>
+                </a>
 
             </div>
 

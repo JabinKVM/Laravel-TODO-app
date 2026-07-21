@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 class ProfileController extends Controller
 {
     /**
@@ -31,73 +34,104 @@ class ProfileController extends Controller
     $highPriorityTasks = Task::where('user_id', $user->id)
         ->where('priority', 'High')
         ->count();
+    
+    $user = Auth::user();
+
+$school = null;
+$student = null;
+
+if ($user->role == 'school') {
+    $school = $user->school;
+}
+
+if ($user->role == 'student') {
+    $student = $user->student;
+}
 
     return view('profile.edit', compact(
-        'user',
-        'totaltasks',
-        'completedTasks',
-        'pendingTasks',
-        'highPriorityTasks'
-    ));
+    'user',
+    'school',
+    'student',
+    'totaltasks',
+    'completedTasks',
+    'pendingTasks',
+    'highPriorityTasks'
+));
 }
 
     /**
      * Update the user's profile information.
      */
-public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function updatePhoto(Request $request)
 {
-    $user = Auth::user();
-
-    // Update user details
-    $user->name = $request->name;
-    $user->email = $request->email;
-
-    // Upload profile photo
-    if ($request->hasFile('profile_photo')) {
-
-        // Delete old photo
-        if ($user->profile_photo &&
-            Storage::disk('public')->exists($user->profile_photo)) {
-
-            Storage::disk('public')->delete($user->profile_photo);
-        }
-
-        // Store new photo
-        $path = $request->file('profile_photo')
-                        ->store('profiles', 'public');
-
-        // Save path
-        $user->profile_photo = $path;
-    }
-
-    // Save user
-    $user->save();
-
-    return redirect()
-            ->route('profile.edit')
-            ->with('success', 'Profile updated successfully.');
-}   
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-{
-    $request->validateWithBag('userDeletion', [
-        'password' => ['required', 'current_password'],
+    $request->validate([
+        'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
-    $user = $request->user();
+    $user = Auth::user();
 
-    Auth::logout();
+    // Delete old photo
+    if ($user->profile_photo &&
+        Storage::disk('public')->exists($user->profile_photo)) {
 
-    $user->delete();
+        Storage::disk('public')->delete($user->profile_photo);
+    }
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+    // Store new photo
+    $path = $request->file('profile_photo')
+        ->store('profile_photos', 'public');
 
-    return redirect()->route('login')
-    ->with('success', 'Your account has been deleted successfully.');
+    $user->profile_photo = $path;
+    $user->save();
+
+    return back()->with('success', 'Profile photo updated successfully.');
+}
+    public function update(Request $request)
+{
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('users')->ignore(Auth::id()),
+        ],
+    ]);
+
+    $user = Auth::user();
+
+    $user->update([
+        'name'  => $request->name,
+        'email' => $request->email,
+    ]);
+
+    return back()->with('success', 'Profile updated successfully.');
+}
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => ['required'],
+        'password' => ['required', 'confirmed', 'min:8'],
+    ]);
+
+    $user = Auth::user();
+
+    if (!Hash::check($request->current_password, $user->password)) {
+
+        throw ValidationException::withMessages([
+            'current_password' => 'Current password is incorrect.',
+        ]);
+
+    }
+
+    $user->password = Hash::make($request->password);
+
+    $user->save();
+
+    return back()->with('success', 'Password changed successfully.');
+}
+public function destroy(Request $request)
+{
+    abort(404);
 }
 }
 

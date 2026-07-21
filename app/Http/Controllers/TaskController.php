@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Models\School;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-
     /*
     |--------------------------------------------------------------------------
     | SCHOOL - Assigned Tasks
@@ -21,15 +19,16 @@ class TaskController extends Controller
     {
         $school = Auth::user()->school;
 
-        $tasks = Task::with('user')
-
-            ->where('created_by', Auth::id())
-
+        $tasks = Task::with('student')
+            ->where('school_id', $school->id)
             ->latest()
+            ->get();
 
-            ->paginate(10);
-
-        return view('school.tasks.index', compact('tasks'));
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'role'  => 'school',
+            'title' => 'Assigned Tasks',
+        ]);
     }
 
     /*
@@ -43,11 +42,15 @@ class TaskController extends Controller
         $school = Auth::user()->school;
 
         $students = Student::where('school_id', $school->id)
-            ->where('status',1)
+            ->where('status', true)
             ->orderBy('name')
             ->get();
 
-        return view('school.tasks.create', compact('students'));
+        return view('tasks.create', [
+            'students' => $students,
+            'role'     => 'school',
+            'title'    => 'Assign Task',
+        ]);
     }
 
     /*
@@ -59,66 +62,74 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
-            'user_id'=>'required|exists:users,id',
-
-            'title'=>'required|max:255',
-
-            'description'=>'nullable',
-
-            'priority'=>'required|in:Low,Medium,High',
-
-            'due_date'    => 'nullable|date',
-
+            'student_id'  => 'required|exists:students,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority'    => 'required|in:High,Medium,Low',
+            'due_date'    => 'required|date',
         ]);
 
+        $school = Auth::user()->school;
+
         Task::create([
-
-            'user_id'=>$request->user_id,
-
-            'created_by'=>Auth::id(),
-
-            'title'=>$request->title,
-
-            'description'=>$request->description,
-
-            'priority'=>$request->priority,
-
+            'school_id'   => $school->id,
+            'student_id'  => $request->student_id,
+            'title'       => $request->title,
+            'description' => $request->description,
+            'priority'    => $request->priority,
             'due_date'    => $request->due_date,
-
-            'completed'=>false
-
+            'status'      => 'Pending',
         ]);
 
         return redirect()
-
             ->route('school.tasks.index')
-
-            ->with('success','Task assigned successfully.');
+            ->with('success', 'Task assigned successfully.');
     }
         /*
+    |--------------------------------------------------------------------------
+    | SCHOOL - View Task
+    |--------------------------------------------------------------------------
+    */
+
+    public function show($id)
+    {
+        $school = Auth::user()->school;
+
+        $task = Task::with('student')
+            ->where('school_id', $school->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return view('tasks.show', [
+            'task'  => $task,
+            'role'  => 'school',
+            'title' => 'Task Details',
+        ]);
+    }
+
+    /*
     |--------------------------------------------------------------------------
     | SCHOOL - Edit Task
     |--------------------------------------------------------------------------
     */
 
-    public function edit($id)
-    {
-        $task = Task::findOrFail($id);
+   public function edit($id)
+{
+    $school = Auth::user()->school;
 
-        if ($task->created_by != Auth::id()) {
-            abort(403);
-        }
+    $task = Task::where('school_id', $school->id)
+        ->where('id', $id)
+        ->firstOrFail();
 
-        $school = Auth::user()->school;
+    $students = Student::where('school_id', $school->id)
+        ->orderBy('name')
+        ->get();
 
-        $students = Student::where('school_id', $school->id)
-            ->where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        return view('school.tasks.edit', compact('task', 'students'));
-    }
+    return view('tasks.edit', [
+        'task' => $task,
+        'students' => $students,
+    ]);
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -129,41 +140,29 @@ class TaskController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-
-            'user_id'     => 'required|exists:users,id',
-
-            'title'       => 'required|max:255',
-
-            'description' => 'nullable',
-
-            'priority'    => 'required|in:Low,Medium,High',
-            
-            'due_date' => 'nullable|date',
-
+            'student_id'  => 'required|exists:students,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority'    => 'required|in:High,Medium,Low',
+            'due_date'    => 'required|date',
         ]);
 
-        $task = Task::findOrFail($id);
+        $school = Auth::user()->school;
 
-        if ($task->created_by != Auth::id()) {
-            abort(403);
-        }
+        $task = Task::where('school_id', $school->id)
+            ->where('id', $id)
+            ->firstOrFail();
 
         $task->update([
-
-            'user_id'     => $request->user_id,
-
+            'student_id'  => $request->student_id,
             'title'       => $request->title,
-
             'description' => $request->description,
-
-            'priority'    => $request->priority
-
+            'priority'    => $request->priority,
+            'due_date'    => $request->due_date,
         ]);
 
         return redirect()
-
             ->route('school.tasks.index')
-
             ->with('success', 'Task updated successfully.');
     }
 
@@ -175,18 +174,16 @@ class TaskController extends Controller
 
     public function destroy($id)
     {
-        $task = Task::findOrFail($id);
+        $school = Auth::user()->school;
 
-        if ($task->created_by != Auth::id()) {
-            abort(403);
-        }
+        $task = Task::where('school_id', $school->id)
+            ->where('id', $id)
+            ->firstOrFail();
 
         $task->delete();
 
         return redirect()
-
             ->route('school.tasks.index')
-
             ->with('success', 'Task deleted successfully.');
     }
         /*
@@ -197,43 +194,128 @@ class TaskController extends Controller
 
     public function myTasks()
     {
-        $tasks = Task::where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+        $student = Auth::user()->student;
 
-        return view('student.tasks.index', compact('tasks'));
+        $tasks = Task::with('school')
+            ->where('student_id', $student->id)
+            ->latest()
+            ->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'role'  => 'student',
+            'title' => 'My Tasks',
+        ]);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | STUDENT - View Single Task
+    | STUDENT - Pending Tasks
     |--------------------------------------------------------------------------
     */
 
-    public function show($id)
+    public function pendingTasks()
     {
-        $task = Task::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $student = Auth::user()->student;
 
-        return view('student.tasks.show', compact('task'));
+        $tasks = Task::with('school')
+            ->where('student_id', $student->id)
+            ->where('status', 'Pending')
+            ->latest()
+            ->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'role'  => 'student',
+            'title' => 'Pending Tasks',
+        ]);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | STUDENT - Mark Complete
+    | STUDENT - Completed Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    public function completedTasks()
+    {
+        $student = Auth::user()->student;
+
+        $tasks = Task::with('school')
+            ->where('student_id', $student->id)
+            ->where('status', 'Completed')
+            ->latest()
+            ->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'role'  => 'student',
+            'title' => 'Completed Tasks',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - High Priority Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    public function highPriorityTasks()
+    {
+        $student = Auth::user()->student;
+
+        $tasks = Task::with('school')
+            ->where('student_id', $student->id)
+            ->where('priority', 'High')
+            ->latest()
+            ->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'role'  => 'student',
+            'title' => 'High Priority Tasks',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - View Task
+    |--------------------------------------------------------------------------
+    */
+
+    public function studentShow($id)
+    {
+        $student = Auth::user()->student;
+
+        $task = Task::with('school')
+            ->where('student_id', $student->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return view('tasks.show', [
+            'task'  => $task,
+            'role'  => 'student',
+            'title' => 'Task Details',
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT - Mark Completed
     |--------------------------------------------------------------------------
     */
 
     public function complete($id)
     {
-        $task = Task::where('id', $id)
-            ->where('user_id', Auth::id())
+        $student = Auth::user()->student;
+
+        $task = Task::where('student_id', $student->id)
+            ->where('id', $id)
             ->firstOrFail();
 
-        $task->completed = true;
-
-        $task->save();
+        $task->update([
+            'status' => 'Completed',
+        ]);
 
         return redirect()
             ->back()
@@ -242,19 +324,21 @@ class TaskController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | STUDENT - Mark Pending Again
+    | STUDENT - Mark Pending
     |--------------------------------------------------------------------------
     */
 
     public function pending($id)
     {
-        $task = Task::where('id', $id)
-            ->where('user_id', Auth::id())
+        $student = Auth::user()->student;
+
+        $task = Task::where('student_id', $student->id)
+            ->where('id', $id)
             ->firstOrFail();
 
-        $task->completed = false;
-
-        $task->save();
+        $task->update([
+            'status' => 'Pending',
+        ]);
 
         return redirect()
             ->back()

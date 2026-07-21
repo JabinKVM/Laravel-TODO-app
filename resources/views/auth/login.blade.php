@@ -316,6 +316,16 @@
 
                 @endif
 
+                @if (Route::has('register'))
+<div class="mt-3 text-center">
+    <span class="text-muted">Don't have an account?</span>
+
+    <a href="{{ route('register') }}" class="fw-bold text-primary">
+        Register
+    </a>
+</div>
+@endif
+
             </form>
 
         </div>

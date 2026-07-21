@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\School;
 use App\Models\Student;
-use App\Models\User;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,58 +22,43 @@ class SchoolController extends Controller
 
     public function dashboard()
     {
-        $school = Auth::user()->school;
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
         $totalStudents = Student::where('school_id', $school->id)->count();
 
         $activeStudents = Student::where('school_id', $school->id)
-            ->where('status', true)
-            ->count();
+                                    ->where('status', true)
+                                    ->count();
 
         $blockedStudents = Student::where('school_id', $school->id)
-            ->where('status', false)
-            ->count();
-        $assignedTasks = Task::where('created_by', Auth::id())->count();
-        $recentStudents = Student::where('school_id', $school->id)
-            ->latest()
-            ->take(5)
-            ->get();
+                                    ->where('status', false)
+                                    ->count();
 
-        return view('school.dashboard', compact(
-
+        return view('schools.dashboard', compact(
+            'school',
             'totalStudents',
-
             'activeStudents',
-
-            'blockedStudents',
-
-            'assignedTasks',
-
-            'recentStudents'
-
+            'blockedStudents'
         ));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Student List
+    | View Students
     |--------------------------------------------------------------------------
     */
 
-    public function students()
-    {
-        $school = Auth::user()->school;
+   public function students()
+{
+    $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        $students = Student::where('school_id', $school->id)
-            ->latest()
-            ->paginate(10);
+    $students = Student::where('school_id', $school->id)
+        ->with('user')
+        ->latest()
+        ->paginate(10);
 
-        return view(
-            'school.students.index',
-            compact('students')
-        );
-    }
-
+    return view('students.index', compact('students'));
+}
     /*
     |--------------------------------------------------------------------------
     | Register Student
@@ -82,7 +67,7 @@ class SchoolController extends Controller
 
     public function createStudent()
     {
-        return view('school.students.create');
+        return view('students.create');
     }
 
     /*
@@ -93,34 +78,32 @@ class SchoolController extends Controller
 
     public function storeStudent(Request $request)
     {
-
+        
         $request->validate([
 
-            'student_id' => 'required|unique:students',
-
-            'name' => 'required|max:255',
+            'name' => 'required|string|max:255',
 
             'email' => 'required|email|unique:users,email',
 
-            'phone' => 'required',
+            'phone' => 'required|string|max:20',
 
-            'gender' => 'required',
-
-            'dob' => 'required|date',
-
-            'department' => 'required',
-
-            'address' => 'nullable',
+            'address' => 'required|string',
 
             'password' => 'required|min:6|confirmed',
 
         ]);
 
+        $school = School::where('user_id', Auth::id())->firstOrFail();
+
         DB::beginTransaction();
 
         try {
 
-            $school = Auth::user()->school;
+            /*
+            |--------------------------------------------------------------------------
+            | Create Login
+            |--------------------------------------------------------------------------
+            */
 
             $user = User::create([
 
@@ -136,25 +119,24 @@ class SchoolController extends Controller
 
             ]);
 
-            Student::create([
+            /*
+            |--------------------------------------------------------------------------
+            | Create Student
+            |--------------------------------------------------------------------------
+            */
 
-                'user_id' => $user->id,
+            Student::create([
 
                 'school_id' => $school->id,
 
-                'student_id' => $request->student_id,
+                'user_id' => $user->id,
+                'student_id' => $school->id,
 
                 'name' => $request->name,
 
                 'email' => $request->email,
 
                 'phone' => $request->phone,
-
-                'gender' => $request->gender,
-
-                'dob' => $request->dob,
-
-                'department' => $request->department,
 
                 'address' => $request->address,
 
@@ -165,46 +147,34 @@ class SchoolController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('school.students')
-                ->with(
-                    'success',
-                    'Student registered successfully.'
-                );
+                    ->route('school.students.index')
+                    ->with('success', 'Student registered successfully.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
 
             return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+                    ->withInput()
+                    ->with('error', $e->getMessage());
 
         }
-
     }
         /*
     |--------------------------------------------------------------------------
-    | View Student
+    | Student Details
     |--------------------------------------------------------------------------
     */
 
-    public function showStudent(Student $student)
+    public function studentDetails($id)
     {
-        $school = Auth::user()->school;
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        if ($student->school_id != $school->id) {
+       $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
 
-            abort(403);
-
-        }
-
-        return view(
-            'school.students.show',
-            compact('student')
-        );
+        return view('students.show', compact('student'));
     }
 
     /*
@@ -213,20 +183,15 @@ class SchoolController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function editStudent(Student $student)
+    public function editStudent($id)
     {
-        $school = Auth::user()->school;
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        if ($student->school_id != $school->id) {
+      $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
 
-            abort(403);
-
-        }
-
-        return view(
-            'school.students.edit',
-            compact('student')
-        );
+        return view('students.edit', compact('student'));
     }
 
     /*
@@ -235,32 +200,25 @@ class SchoolController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function updateStudent(Request $request, Student $student)
+    public function updateStudent(Request $request, $id)
     {
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        $school = Auth::user()->school;
+        $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
 
-        if ($student->school_id != $school->id) {
-
-            abort(403);
-
-        }
+        $user = User::findOrFail($student->user_id);
 
         $request->validate([
 
-            'student_id' => 'required|unique:students,student_id,' . $student->id,
+            'name' => 'required|string|max:255',
 
-            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
 
-            'email' => 'required|email|unique:users,email,' . $student->user_id,
+            'phone' => 'required|string|max:20',
 
-            'phone' => 'required',
-
-            'gender' => 'required',
-
-            'dob' => 'required|date',
-
-            'address' => 'nullable',
+            'address' => 'required|string',
 
         ]);
 
@@ -268,9 +226,27 @@ class SchoolController extends Controller
 
         try {
 
-            $student->update([
+            /*
+            |--------------------------------------------------------------------------
+            | Update User
+            |--------------------------------------------------------------------------
+            */
 
-                'student_id' => $request->student_id,
+            $user->update([
+
+                'name' => $request->name,
+
+                'email' => $request->email,
+
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Student
+            |--------------------------------------------------------------------------
+            */
+
+            $student->update([
 
                 'name' => $request->name,
 
@@ -278,92 +254,106 @@ class SchoolController extends Controller
 
                 'phone' => $request->phone,
 
-                'gender' => $request->gender,
-
-                'dob' => $request->dob,
-
                 'address' => $request->address,
-
-            ]);
-
-            $student->user->update([
-
-                'name' => $request->name,
-
-                'email' => $request->email,
 
             ]);
 
             DB::commit();
 
             return redirect()
-                ->route('school.students')
-                ->with(
-                    'success',
-                    'Student updated successfully.'
-                );
+                    ->route('school.students.index')
+                    ->with('success', 'Student updated successfully.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
 
             return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+                    ->withInput()
+                    ->with('error', $e->getMessage());
 
         }
-
     }
         /*
     |--------------------------------------------------------------------------
-    | Block / Unblock Student
+    | Block Student
     |--------------------------------------------------------------------------
     */
 
-    public function toggleStudentStatus(Student $student)
+    public function blockStudent($id)
     {
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        $school = Auth::user()->school;
-
-        if ($student->school_id != $school->id) {
-
-            abort(403);
-
-        }
+        $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
 
         DB::beginTransaction();
 
         try {
 
-            $student->status = !$student->status;
+            $student->update([
+                'status' => false,
+            ]);
 
-            $student->save();
-
-            $student->user->status = $student->status;
-
-            $student->user->save();
+            User::where('id', $student->user_id)->update([
+                'status' => false,
+            ]);
 
             DB::commit();
 
-            return back()->with(
-                'success',
-                'Student status updated successfully.'
-            );
+            return redirect()
+                    ->route('school.students.index')
+                    ->with('success', 'Student blocked successfully.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                $e->getMessage()
-            );
+            return back()->with('error', $e->getMessage());
 
         }
+    }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Unblock Student
+    |--------------------------------------------------------------------------
+    */
+
+    public function unblockStudent($id)
+    {
+        $school = School::where('user_id', Auth::id())->firstOrFail();
+
+        $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
+
+        DB::beginTransaction();
+
+        try {
+
+            $student->update([
+                'status' => true,
+            ]);
+
+            User::where('id', $student->user_id)->update([
+                'status' => true,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                    ->route('school.students.index')
+                    ->with('success', 'Student activated successfully.');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with('error', $e->getMessage());
+
+        }
     }
 
     /*
@@ -372,16 +362,13 @@ class SchoolController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function destroyStudent(Student $student)
+    public function deleteStudent($id)
     {
+        $school = School::where('user_id', Auth::id())->firstOrFail();
 
-        $school = Auth::user()->school;
-
-        if ($student->school_id != $school->id) {
-
-            abort(403);
-
-        }
+       $student = Student::where('school_id', $school->id)
+    ->where('id', $id)
+    ->firstOrFail();
 
         DB::beginTransaction();
 
@@ -389,15 +376,19 @@ class SchoolController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Delete Login Account
+            | Delete Student Tasks
             |--------------------------------------------------------------------------
             */
 
-            if ($student->user) {
+            Task::where('student_id', $student->id)->delete();
 
-                $student->user->delete();
+            /*
+            |--------------------------------------------------------------------------
+            | Delete Login
+            |--------------------------------------------------------------------------
+            */
 
-            }
+            User::where('id', $student->user_id)->delete();
 
             /*
             |--------------------------------------------------------------------------
@@ -410,22 +401,16 @@ class SchoolController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('school.students')
-                ->with(
-                    'success',
-                    'Student deleted successfully.'
-                );
+                    ->route('school.students.index')
+                    ->with('success', 'Student deleted successfully.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                $e->getMessage()
-            );
+            return back()->with('error', $e->getMessage());
 
         }
-
     }
+
 }

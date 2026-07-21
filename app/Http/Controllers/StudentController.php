@@ -14,34 +14,36 @@ class StudentController extends Controller
     */
 
     public function dashboard()
-    {
-        $totalTasks = Task::where('user_id', Auth::id())->count();
+{
+    $student = Auth::user()->student;
 
-        $completedTasks = Task::where('user_id', Auth::id())
-            ->where('completed', true)
-            ->count();
+    $totalTasks = Task::where('student_id', $student->id)->count();
 
-        $pendingTasks = Task::where('user_id', Auth::id())
-            ->where('completed', false)
-            ->count();
+    $pendingTasks = Task::where('student_id', $student->id)
+        ->where('status', 'Pending')
+        ->count();
 
-        $highPriorityTasks = Task::where('user_id', Auth::id())
-            ->where('priority', 'High')
-            ->count();
+    $completedTasks = Task::where('student_id', $student->id)
+        ->where('status', 'Completed')
+        ->count();
 
-        $recentTasks = Task::where('user_id', Auth::id())
-            ->latest()
-            ->take(5)
-            ->get();
+    $highPriorityTasks = Task::where('student_id', $student->id)
+        ->where('priority', 'High')
+        ->count();
 
-        return view('student.dashboard', compact(
-            'totalTasks',
-            'completedTasks',
-            'pendingTasks',
-            'highPriorityTasks',
-            'recentTasks'
-        ));
-    }
+    $recentTasks = Task::where('student_id', $student->id)
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return view('students.dashboard', compact(
+        'totalTasks',
+        'pendingTasks',
+        'completedTasks',
+        'highPriorityTasks',
+        'recentTasks'
+    ));
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -49,14 +51,20 @@ class StudentController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function myTasks()
-    {
-        $tasks = Task::where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+   public function myTasks()
+{
+    $student = Auth::user()->student;
 
-        return view('student.tasks.index', compact('tasks'));
-    }
+    $tasks = Task::where('student_id', $student->id)
+        ->latest()
+        ->get();
+
+    return view('tasks.index', [
+        'tasks' => $tasks,
+        'role'  => 'student',
+        'title' => 'My Tasks',
+    ]);
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -64,34 +72,42 @@ class StudentController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function show(Task $task)
-    {
-        if ($task->user_id != Auth::id()) {
-            abort(403);
-        }
+   public function show($id)
+{
+    $student = Auth::user()->student;
 
-        return view('student.tasks.show', compact('task'));
-    }
+    $task = Task::where('student_id', $student->id)
+        ->where('id', $id)
+        ->firstOrFail();
+
+    return view('tasks.show', [
+        'task'  => $task,
+        'role'  => 'student',
+        'title' => 'Task Details',
+    ]);
+}
         /*
     |--------------------------------------------------------------------------
     | Mark Task as Completed
     |--------------------------------------------------------------------------
     */
 
-    public function complete(Task $task)
-    {
-        if ($task->user_id != Auth::id()) {
-            abort(403);
-        }
+    public function complete($id)
+{
+    $student = Auth::user()->student;
 
-        $task->update([
-            'completed' => true,
-        ]);
+    $task = Task::where('student_id', $student->id)
+        ->where('id', $id)
+        ->firstOrFail();
 
-        return redirect()
-            ->route('student.tasks')
-            ->with('success', 'Task marked as completed successfully.');
-    }
+    $task->update([
+        'status' => 'Completed',
+    ]);
+
+    return redirect()
+        ->route('student.tasks.index')
+        ->with('success', 'Task marked as completed.');
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -99,18 +115,20 @@ class StudentController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function pending(Task $task)
-    {
-        if ($task->user_id != Auth::id()) {
-            abort(403);
-        }
+    public function pending($id)
+{
+    $student = Auth::user()->student;
 
-        $task->update([
-            'completed' => false,
-        ]);
+    $task = Task::where('student_id', $student->id)
+        ->where('id', $id)
+        ->firstOrFail();
 
-        return redirect()
-            ->route('student.tasks')
-            ->with('success', 'Task marked as pending.');
-    }
+    $task->update([
+        'status' => 'Pending',
+    ]);
+
+    return redirect()
+        ->route('student.tasks.index')
+        ->with('success', 'Task marked as pending.');
+}
 }
