@@ -74,4 +74,6 @@
       <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}"
             rel="stylesheet">
 
+
+      <link rel="stylesheet" href="{{ asset('assets/css/chat.css') }}">
 </head>

@@ -1,316 +1,456 @@
 @extends('layouts.master')
 
-@section('title','Messages')
+@section('title','Chat')
 
 @section('content')
 
-<div class="page-content">
+<link rel="stylesheet" href="{{ asset('assets/css/chat.css') }}">
+<h4 class="mb-4">Messages</h4>
 
-    <div class="container-fluid">
+<div class="chat-page">
 
-        <div class="row">
+    <div class="chat-wrapper">
+
+        <!-- ========================= -->
+        <!-- LEFT PANEL -->
+        <!-- ========================= -->
+
+        <div class="chat-left">
+
+            <!-- Profile -->
+
+            <div class="chat-profile">
+
+                <div class="d-flex align-items-center">
+
+                    @php
+                        $me = auth()->user();
+                    @endphp
+
+                    <img
+                        src="{{ $me->profile_photo
+                                ? asset('storage/'.$me->profile_photo)
+                                : asset('assets/images/users/avatar-1.jpg') }}"
+                        class="profile-avatar">
+
+                    <div class="ms-3">
+
+                        @if($role=='school')
+
+                            <h3>{{ $me->school->name }}</h3>
+
+                            <span class="status">
+
+                                <i class="bx bxs-circle text-success"></i>
+
+                                Active
+
+                            </span>
+
+                        @else
+
+                            <h3>{{ $me->student->name }}</h3>
+
+                            <span class="status">
+
+                                <i class="bx bxs-circle text-success"></i>
+
+                                Online
+
+                            </span>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Search -->
+
+            <div class="chat-search">
+
+                <form method="GET">
+
+                    <div class="search-box">
+
+                        <i class="bx bx-search"></i>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Search conversations...">
+
+                       
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- Heading -->
+
+            <div class="chat-heading">
+
+                <h4>Chats</h4>
+
+                <small>Recent Conversations</small>
+
+            </div>
 
             <!-- Contact List -->
 
-            <div class="col-lg-4">
+            <div class="chat-users">
 
-                <div class="card">
+                @forelse($contacts as $contact)
 
-                    <div class="card-header">
+                    @php
 
-                        <h4 class="card-title mb-0">
+                        $chatRoute = $role=='school'
+                            ? route('school.chat.open',$contact->id)
+                            : route('student.chat.open',$contact->id);
 
-                            Messages
+                        $photo = optional($contact->user)->profile_photo;
 
-                        </h4>
+                    @endphp
 
-                    </div>
+                    <a
+                        href="{{ $chatRoute }}"
+                        class="chat-user-item {{ $activeChat==$contact->id ? 'active' : '' }}">
 
-                    <div class="card-body p-0">
+                        <div class="user-avatar">
 
-                        <div class="p-3">
+                            <img
+                                src="{{ $photo
+                                        ? asset('storage/'.$photo)
+                                        : asset('assets/images/users/avatar-2.jpg') }}">
 
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Search..."
-                            >
-
-                        </div>
-
-                        <div style="height:650px;overflow-y:auto;">
-
-                            @forelse($contacts as $contact)
-
-                                @php
-
-                                    if($role=='school'){
-                                        $route = route('school.chat.open',$contact->id);
-                                        $name = $contact->name;
-                                        $subtitle = $contact->student_id;
-                                    }else{
-                                        $route = route('student.chat.open',$contact->id);
-                                        $name = $contact->school_name;
-                                        $subtitle = $contact->email;
-                                    }
-
-                                @endphp
-
-                                <a href="{{ $route }}"
-                                   class="text-decoration-none text-dark">
-
-                                    <div class="d-flex align-items-center p-3 border-bottom">
-
-                                        <div class="avatar-sm">
-
-                                            <span class="avatar-title rounded-circle bg-primary">
-
-                                                {{ strtoupper(substr($name,0,1)) }}
-
-                                            </span>
-
-                                        </div>
-
-                                        <div class="ms-3 flex-grow-1">
-
-                                            <h5 class="mb-1">
-
-                                                {{ $name }}
-
-                                            </h5>
-
-                                            <small class="text-muted">
-
-                                                {{ $subtitle }}
-
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-                                </a>
-
-                            @empty
-
-                                <div class="p-5 text-center">
-
-                                    No Contacts Found
-
-                                </div>
-
-                            @endforelse
+                            <span class="online-dot"></span>
 
                         </div>
 
-                    </div>
+                        <div class="user-details">
 
-                </div>
+                            <div class="user-top">
 
-            </div>
-                        <!-- Chat Window -->
+                                <h5>
 
-            <div class="col-lg-8">
+                                    {{ $contact->name }}
 
-                <div class="card">
+                                </h5>
 
-                    @if($conversation)
+                                <small>
 
-                        <div class="card-header">
+                                    @if($contact->last_message_time)
 
-                            <div class="d-flex align-items-center">
+                                        {{ $contact->last_message_time->format('h:i A') }}
 
-                                <div class="avatar-sm">
+                                    @endif
 
-                                    <span class="avatar-title rounded-circle bg-primary">
+                                </small>
 
-                                        @if($role == 'school')
+                            </div>
 
-                                            {{ strtoupper(substr($conversation->student->student->name,0,1)) }}
+                            <div class="user-bottom">
 
-                                        @else
+                                <span>
 
-                                            {{ strtoupper(substr($conversation->school->school->school_name,0,1)) }}
+                                    {{ $contact->last_message
+                                        ? \Illuminate\Support\Str::limit($contact->last_message,28)
+                                        : 'Start conversation...' }}
 
-                                        @endif
+                                </span>
+
+                                @if($contact->unread_count)
+
+                                    <span class="unread-count">
+
+                                        {{ $contact->unread_count }}
 
                                     </span>
 
-                                </div>
-
-                                <div class="ms-3">
-
-                                    <h5 class="mb-0">
-
-                                        @if($role == 'school')
-
-                                            {{ $conversation->student->student->name }}
-
-                                        @else
-
-                                            {{ $conversation->school->school->school_name }}
-
-                                        @endif
-
-                                    </h5>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="card-body"
-                             style="height:520px;overflow-y:auto;background:#f8f9fa;">
-
-                            @forelse($messages as $message)
-
-                                @if($message->sender_id == auth()->id())
-
-                                    <div class="d-flex justify-content-end mb-3">
-
-                                        <div
-                                            class="bg-primary text-white rounded px-3 py-2"
-                                            style="max-width:70%;">
-
-                                            {{ $message->message }}
-
-                                            <div class="text-end">
-
-                                                <small>
-
-                                                    {{ $message->created_at->format('h:i A') }}
-
-                                                </small>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                @else
-
-                                    <div class="d-flex justify-content-start mb-3">
-
-                                        <div
-                                            class="bg-white border rounded px-3 py-2"
-                                            style="max-width:70%;">
-
-                                            {{ $message->message }}
-
-                                            <div class="text-end">
-
-                                                <small class="text-muted">
-
-                                                    {{ $message->created_at->format('h:i A') }}
-
-                                                </small>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
                                 @endif
 
-                            @empty
-
-                                <div class="text-center mt-5">
-
-                                    <h5>
-
-                                        No messages yet.
-
-                                    </h5>
-
-                                    <p class="text-muted">
-
-                                        Start the conversation.
-
-                                    </p>
-
-                                </div>
-
-                            @endforelse
-
-                        </div>
-
-                        <div class="card-footer">
-
-                            @if($role == 'school')
-
-                                <form
-                                    action="{{ route('school.chat.send',$conversation->id) }}"
-                                    method="POST">
-
-                            @else
-
-                                <form
-                                    action="{{ route('student.chat.send',$conversation->id) }}"
-                                    method="POST">
-
-                            @endif
-
-                                @csrf
-
-                                <div class="input-group">
-
-                                    <input
-                                        type="text"
-                                        name="message"
-                                        class="form-control"
-                                        placeholder="Type your message..."
-                                        required>
-
-                                    <button
-                                        class="btn btn-primary"
-                                        type="submit">
-
-                                        <i class="bx bx-send"></i>
-
-                                        Send
-
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                    @else
-
-                        <div
-                            class="card-body d-flex align-items-center justify-content-center"
-                            style="height:650px;">
-
-                            <div class="text-center">
-
-                                <i class="bx bx-message-square-dots display-3 text-muted"></i>
-
-                                <h4 class="mt-3">
-
-                                    Select a contact
-
-                                </h4>
-
-                                <p class="text-muted">
-
-                                    Choose a contact from the left to start chatting.
-
-                                </p>
-
                             </div>
 
                         </div>
 
-                    @endif
+                    </a>
+
+                @empty
+
+                    <div class="empty-chat-list">
+
+                        <img
+                            src="{{ asset('assets/images/users/avatar-1.jpg') }}"
+                            width="90">
+
+                        <h5 class="mt-4">
+
+                            No Conversations
+
+                        </h5>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- RIGHT PANEL -->
+        <!-- ========================= -->
+
+        <div class="chat-right">
+
+            @if($chatUser)
+
+                @php
+
+                    $chatPhoto = optional($chatUser->user)->profile_photo;
+
+                @endphp
+
+                <div class="chat-header">
+
+                    <div class="chat-user-info">
+
+                        <img
+                            src="{{ $chatPhoto
+                                    ? asset('storage/'.$chatPhoto)
+                                    : asset('assets/images/users/avatar-2.jpg') }}"
+                            class="header-avatar">
+
+                        <div>
+
+                            <h4>{{ $chatUser->name }}</h4>
+
+                            <small class="text-success">
+
+                                <i class="bx bxs-circle"></i>
+
+                                Online
+
+                            </small>
+
+                        </div>
+
+                    </div>
+                    <!-- message search
+                    <div class="chat-actions">
+
+                        <button>
+
+                            <i class="bx bx-search"></i>
+
+                        </button>
+
+                        <button>
+
+                            <i class="bx bx-phone"></i>
+
+                        </button>
+
+                        <button>
+
+                            <i class="bx bx-dots-vertical-rounded"></i>
+
+                        </button>
+
+                    </div> -->
 
                 </div>
 
-            </div>
+                <!-- Chat body starts here -->
+
+                <div class="chat-body" id="chatBody">
+
+                    <div class="chat-date">
+
+                        <span>Today</span>
+
+                    </div>
+
+                                        @forelse($messages as $message)
+
+                        @if($message->sender_id == auth()->id())
+
+                            <!-- Outgoing Message -->
+
+                            <div class="message-row message-right">
+
+                                <div class="message-box outgoing">
+
+                                    <div class="message-text">
+
+                                        {{ $message->message }}
+
+                                    </div>
+
+                                    <div class="message-info">
+
+                                        <span>
+
+                                            {{ $message->created_at->format('h:i A') }}
+
+                                        </span>
+
+                                        <i class="bx bx-check-double"></i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @else
+
+                            <!-- Incoming Message -->
+
+                            <div class="message-row message-left">
+
+                                <div class="message-box incoming">
+
+                                    <div class="message-text">
+
+                                        {{ $message->message }}
+
+                                    </div>
+
+                                    <div class="message-info">
+
+                                        <span>
+
+                                            {{ $message->created_at->format('h:i A') }}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
+                    @empty
+
+                        <div class="empty-chat">
+
+                            <img
+                                src="{{ asset('assets/images/users/avatar-1.jpg') }}"
+                                width="110">
+
+                            <h3 class="mt-4">
+
+                                No Messages Yet
+
+                            </h3>
+
+                            <p class="text-muted">
+
+                                Start your first conversation.
+
+                            </p>
+
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- Chat Footer -->
+                <!-- ========================= -->
+
+                @php
+
+                    $sendRoute = $role == 'school'
+                        ? route('school.chat.send',$conversation->id)
+                        : route('student.chat.send',$conversation->id);
+
+                @endphp
+
+                <div class="chat-footer">
+
+                    <form
+                        action="{{ $sendRoute }}"
+                        method="POST">
+
+                        @csrf
+
+                        <div class="chat-input-box">
+                            <!--
+                            <button
+                                type="button"
+                                class="input-icon">
+
+                                <i class="bx bx-smile"></i>
+
+                            </button> -->
+
+                            <input
+                                type="text"
+                                name="message"
+                                class="chat-input"
+                                placeholder="Type your message..."
+                                autocomplete="off"
+                                required>
+                            <!-- file send
+                            <button
+                                type="button"
+                                class="input-icon">
+
+                                <i class="bx bx-paperclip"></i>
+
+                            </button> -->
+
+                            <button
+                                type="submit"
+                                class="send-button">
+
+                                <i class="bx bx-send"></i>
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            @else
+
+                <!-- Empty Screen -->
+
+                <div class="chat-empty-screen">
+
+                    <div class="text-center">
+
+                       
+
+                        <h3 class="mt-4">
+
+                            Welcome to TodoPro Chat
+
+                        </h3>
+
+                        <p class="text-muted">
+
+                            Select a conversation from the left to start chatting.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            @endif
 
         </div>
 
@@ -318,4 +458,7 @@
 
 </div>
 
+<script src="{{ asset('assets/js/chat.js') }}"></script>
+
 @endsection
+                    

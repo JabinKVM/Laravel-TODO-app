@@ -110,7 +110,7 @@
                 <div class="dropdown-menu dropdown-menu-end">
 
                     <a class="dropdown-item"
-                       href="{{ route('profile.edit') }}">
+                       href="{{ route(auth()->user()->role . '.profile.edit') }}">
 
                         <i class="bx bx-user me-2"></i>
                         View Profile

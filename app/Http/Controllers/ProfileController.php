@@ -1,119 +1,87 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Task;
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Profile Page
      */
-    public function edit(Request $request): View
-{
-    $user = $request->user();
-
-    $totaltasks = Task::where('user_id', $user->id)->count();
-
-    $completedTasks = Task::where('user_id', $user->id)
-        ->where('completed', true)
-        ->count();
-
-    $pendingTasks = Task::where('user_id', $user->id)
-        ->where('completed', false)
-        ->count();
-
-    $highPriorityTasks = Task::where('user_id', $user->id)
-        ->where('priority', 'High')
-        ->count();
-    
-    $user = Auth::user();
-
-$school = null;
-$student = null;
-
-if ($user->role == 'school') {
-    $school = $user->school;
-}
-
-if ($user->role == 'student') {
-    $student = $user->student;
-}
-
-    return view('profile.edit', compact(
-    'user',
-    'school',
-    'student',
-    'totaltasks',
-    'completedTasks',
-    'pendingTasks',
-    'highPriorityTasks'
-));
-}
-
-    /**
-     * Update the user's profile information.
-     */
-    public function updatePhoto(Request $request)
-{
-    $request->validate([
-        'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
-
-    $user = Auth::user();
-
-    // Delete old photo
-    if ($user->profile_photo &&
-        Storage::disk('public')->exists($user->profile_photo)) {
-
-        Storage::disk('public')->delete($user->profile_photo);
+    public function index()
+    {
+        return view('profile.index', [
+            'user' => Auth::user(),
+        ]);
     }
 
-    // Store new photo
-    $path = $request->file('profile_photo')
-        ->store('profile_photos', 'public');
+    /**
+     * Edit Profile
+     */
+    public function edit()
+    {
+        return view('profile.edit', [
+            'user' => Auth::user(),
+        ]);
+    }
 
-    $user->profile_photo = $path;
-    $user->save();
-
-    return back()->with('success', 'Profile photo updated successfully.');
-}
+    /**
+     * Update Profile
+     */
     public function update(Request $request)
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => [
-            'required',
-            'email',
-            Rule::unique('users')->ignore(Auth::id()),
-        ],
+    {
+        $user = Auth::user();
+        $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
-    $user = Auth::user();
+    if ($request->hasFile('profile_photo')) {
 
-    $user->update([
-        'name'  => $request->name,
-        'email' => $request->email,
-    ]);
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
 
-    return back()->with('success', 'Profile updated successfully.');
-}
-public function updatePassword(Request $request)
+        $user->profile_photo = $request->file('profile_photo')
+            ->store('profiles', 'public');
+    }
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    $user->save();
+    return redirect()
+        ->route(auth()->user()->role.'.profile.index')
+        ->with('success', 'Profile updated successfully.');
+
+
+
+    }
+
+    /**
+     * Change Password Page
+     */
+    public function changePassword()
+    {
+        return view('profile.change_password');
+    }
+
+    /**
+     * Update Password
+     */
+    public function updatePassword(Request $request)
 {
     $request->validate([
         'current_password' => ['required'],
-        'password' => ['required', 'confirmed', 'min:8'],
+        'password' => ['required', 'string', 'min:8', 'confirmed'],
     ]);
 
-    $user = Auth::user();
+    $user = auth()->user();
 
     if (!Hash::check($request->current_password, $user->password)) {
 
@@ -127,12 +95,8 @@ public function updatePassword(Request $request)
 
     $user->save();
 
-    return back()->with('success', 'Password changed successfully.');
-}
-public function destroy(Request $request)
-{
-    abort(404);
+    return redirect()
+        ->route(auth()->user()->role.'.profile.index')
+        ->with('success', 'Password changed successfully.');
 }
 }
-
-

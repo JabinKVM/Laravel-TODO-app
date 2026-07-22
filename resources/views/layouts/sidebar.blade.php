@@ -105,13 +105,10 @@
 
     <li>
 
-        <a href="{{ route('profile.edit') }}">
-
-            <i class="bx bx-user-circle"></i>
-
-            <span>Profile</span>
-
-        </a>
+        <a href="{{ route(auth()->user()->role . '.profile.index') }}">
+    <i class="bx bx-user-circle"></i>
+    <span>Profile</span>
+</a>
 
     </li>
 
@@ -154,7 +151,7 @@
 
                     <li class="menu-title">TASKS</li>
 
-                    <li class="menu-title">TASKS</li>
+                    
 
 <li>
 
@@ -191,7 +188,8 @@
                 High Priority
             </a>
         </li>
-
+</li>
+</ul>
 
         <li class="menu-title">CHAT</li>
 
@@ -206,25 +204,20 @@
     </a>
 
 </li>
-    </ul>
-
-</li>
+    
 
                    
 
-                    <li class="menu-title">SETTINGS</li>
+                   <li class="menu-title">SETTINGS</li>
 
-                    <li>
+    <li>
 
-                        <a href="{{ route('profile.edit') }}">
+        <a href="{{ route(auth()->user()->role . '.profile.index') }}">
+    <i class="bx bx-user-circle"></i>
+    <span>Profile</span>
+</a>
 
-                            <i class="bx bx-user-circle"></i>
-
-                            <span>Profile</span>
-
-                        </a>
-
-                    </li>
+    </li>
 
                     <li>
 

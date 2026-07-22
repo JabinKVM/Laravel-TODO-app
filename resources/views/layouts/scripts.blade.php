@@ -18,3 +18,6 @@
 <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
 
 <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
+
+<script src="{{ asset('assets/js/app.js') }}"></script>
+
